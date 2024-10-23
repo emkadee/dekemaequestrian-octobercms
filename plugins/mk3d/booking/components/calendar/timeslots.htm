@@ -1,11 +1,22 @@
-{{ date }}
-{{ location_id}}
+{{ date |date("l d F Y") }}
+{{ location_id }}
+{{ location_name }}
 <script>
 $(document).ready(function() {
-        // Initialize reservation form modal
-        initializeReservationForm();
-        });
+    // Initialize reservation form modal
+    initializeReservationForm();
+    });
 </script>
+
+<div class="form-group">
+    <label for="reservation_date">Datum</label>
+    {% if date is not empty %}
+    <input type="date" name="reservation_date" id="reservation_date" class="form-control" value="{{ date }}" required>
+    {% else %}
+    <input type="date" name="reservation_date" id="reservation_date" class="form-control" value="{{ "now"|date("Y-m-d") }}" required>    
+    {% endif %}
+</div>
+<button id="show-timeslots" class="btn btn-primary">Show Timeslots</button>
 
 {% if matchReservationsWithTimeSlots is not empty %}
 <div class="row timeslots">
@@ -68,6 +79,129 @@ $(document).ready(function() {
     <p>No time slots found for this location.</p>
 {% endif %}   
 </div>
+
+<!-- Modal -->
+<div class="modal fade modal-custom" id="reservationModal" tabindex="-1" role="dialog" aria-labelledby="reservationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reservationModalLabel">Reservation Form</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-request="onSubmitReservation">
+                    <input type="hidden" name="time" id="modal-time">
+                    <input type="hidden" name="location_id" id="modal-location">
+                    <input type="hidden" name="date" id="modal-date">
+                    
+                    <div class="form-group">
+                        <label for="name" class="label-custom">Name</label>
+                        <input type="text" name="name" id="name" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="label-custom">Email</label>
+                        <input type="email" name="email" id="email" class="form-control" required>
+                    </div>                   
+                    <div class="form-group">
+                        <label for="duration" class="label-custom">Aantal uur</label>
+                        <input type="number" name="duration" id="duration" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="recurring" class="label-custom">Reservering herhalen?</label>
+                        <input type="checkbox" value="false" name="recurring" id="recurring" class="form-control">
+                    </div>
+                    <div id="recurring_form" style="display: none;">
+                        <div class="form-group">
+                            <label for="recurring_interval" class="label-custom">Herhalen</label>
+                            <select name="recurring_interval" id="recurring_interval" class="form-control">
+                                <option value="1">Iedere week</option>
+                                <option value="2">Iedere twee weken</option>
+                                <option value="4">Iedere vier weken</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="recurring_end_date" class="label-custom">Eind datum</label>
+                            <input type="date" name="recurring_end_date" id="recurring_end_date" class="form-control">
+                        </div>
+                        <div class="form-group">Aantal keer : <div id="recurring_count">1</div>                            
+                        </div>
+                    </div>                 
+                    <br />                    
+                    <button type="submit" class="btn btn-primary">Submit Reservation</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function initializeReservationForm() {
+        $('.open-reservation-form').on('click', function(e) {
+            e.preventDefault();
+            var time = $(this).data('time');
+            var location = $(this).data('location');
+            var date = $(this).data('date');
+            $('#modal-time').val(time);
+            $('#modal-location').val(location);
+            $('#modal-date').val(date);
+            $('#reservationModal').modal('show');
+        });
+    }
+
+    function calculateRecurringCount() {
+        var startDate = new Date($('#reservation_date').val());
+        var endDate = new Date($('#recurring_end_date').val());
+        var interval = parseInt($('#recurring_interval').val());
+
+        if (isNaN(interval) || !startDate || !endDate || endDate <= startDate) {
+            $('#recurring_count').text('1');
+            return;
+        }
+
+        var timeDiff = endDate - startDate;
+        var weeksDiff = timeDiff / (1000 * 60 * 60 * 24 * 7);
+        var count = Math.floor(weeksDiff / interval) + 1;
+
+        $('#recurring_count').text(count);
+    }
+
+    $(document).ready(function() {
+        // Initialize reservation form modal
+        initializeReservationForm();
+
+        // Show/hide recurring form based on checkbox
+        $('#recurring').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('#recurring_form').show();
+            } else {
+                $('#recurring_form').hide();
+                $('#recurring_count').text('1');
+            }
+        });
+
+        // Calculate recurring count on date or interval change
+        $('#recurring_end_date, #recurring_interval, #reservation_date').on('change', calculateRecurringCount);
+
+
+        // Show timeslots based on selected date
+        $('#show-timeslots').on('click', function(e) {
+            e.preventDefault();
+            console.log('Show Timeslots button clicked');
+            var date = $('#reservation_date').val();
+            var locationId = "{{ location_id }}";
+
+            oc.request(this, 'onFilterTimeslots', {
+                data: { date: date, location_id: locationId },
+                update: { '@timeslots': '#timeslots-container' }
+
+            });
+        });
+    });
+
+</script>
 
 
 

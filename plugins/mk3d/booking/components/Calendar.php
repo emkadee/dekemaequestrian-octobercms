@@ -36,13 +36,19 @@ class Calendar extends ComponentBase
     public $matchReservationsWithTimeSlots;
     public $location_id;
     public $date;
+    public $location_name;
 
 
     public function onRun()
     {
         $this->page['matchReservationsWithTimeSlots'] = $this->matchReservationsWithTimeSlots();
         $this->page['location_id'] = $this->property('location_id');
-        $this->page['date'] = input('date', date('Y-m-d'));            
+        $this->page['date'] = input('date', date('Y-m-d'));  
+        
+        // Fetch the location name
+        $location = Location::find($this->property('location_id'));
+        Log::info('Location : ' . $location->name);
+        $this->page['location_name'] = $location->name;
     }
 
     public function onFilterTimeslots()
@@ -56,12 +62,14 @@ class Calendar extends ComponentBase
 
         $this->page['date'] = $date;
         $this->page['location_id'] = $locationId;
+        // Fetch the location name
+        $location = Location::find($this->property('location_id'));
+        $this->page['location_name'] = $location->name;   
         $this->page['matchReservationsWithTimeSlots'] = $this->matchReservationsWithTimeSlots($date, $locationId);
         
     }
 
-    public function onSubmitReservation() {
-        
+    public function onSubmitReservation() {      
         
         $data = post();
 
@@ -74,11 +82,19 @@ class Calendar extends ComponentBase
             'date'     => 'required|date'
         ];
 
+        if (isset($data['recurring']) && $data['recurring'] == 'true') {
+            $rules['recurring_interval'] = 'required|integer|min:1';
+            $rules['recurring_end_date'] = 'required|date|after:date';
+        }
+
+
         $validation = Validator::make($data, $rules);
 
         if ($validation->fails()) {
             throw new ValidationException($validation);
         }
+
+        
 
 
         $customer_name = Input::get('name');
@@ -87,6 +103,20 @@ class Calendar extends ComponentBase
         $time = Input::get('time');
         $duration = Input::get('duration');
         $date = Input::get('date'); // Get the date from the form data
+        $endDate = Input::get('recurring_end_date');
+        $interval = Input::get('recurring_interval');
+
+
+        // Calculate the number of reservations
+        $startDate = new \DateTime($date);
+        $endDate = isset($endDate) ? new \DateTime($endDate) : null;
+        $interval = isset($interval) ? (int)$interval : 1;
+        $recurringCount = 1;
+
+        if ($endDate) {
+            $weeksDiff = $startDate->diff($endDate)->days / 7;
+            $recurringCount = (int)floor($weeksDiff / $interval) + 1;
+        }
     
         Log::info('Customer Name: ' . $customer_name);
         Log::info('Customer Email: ' . $customer_email);
@@ -94,13 +124,17 @@ class Calendar extends ComponentBase
         Log::info('Time: ' . $time);
         Log::info('Duration: ' . $duration);
         Log::info('Date: ' . $date); // Log the date
+        Log::info('Startdate: ' . $startDate->format('Y-m-d H:i:s'));
+        Log::info('Enddate: ' . ($endDate ? $endDate->format('Y-m-d H:i:s') : 'N/A'));
+        Log::info('Interval: ' . $interval);
+        Log::info('recurringCount: ' . $recurringCount);
+
     
         $startTime = strtotime($time);
         $endTime = strtotime('+' . ($duration * 60) . ' minutes', $startTime);
-
         $endTime = strtotime('-1 minute', $endTime);
     
-        // Check for overlapping reservations
+/*         // Check for overlapping reservations
         $overlappingReservations = Reservation::where('location_id', $location_id)
             ->whereDate('reservation_date', $date) // Ensure the date is considered
             ->where(function($query) use ($startTime, $endTime) {
@@ -116,18 +150,44 @@ class Calendar extends ComponentBase
         if ($overlappingReservations) {
             \Flash::error('The selected timeslot is already reserved. Please choose a different timeslot.');
             return;
+        } */
+    
+        // Create reservations
+        for ($i = 0; $i < $recurringCount; $i++) {
+            $reservationDate = clone $startDate;
+            $reservationDate->modify("+" . ($i * $interval) . " weeks");
+
+            $startTime = strtotime($reservationDate->format('Y-m-d') . ' ' . $time);
+            $endTime = $startTime + ($data['duration'] * 3600);
+
+            // Check for overlapping reservations
+            $overlappingReservations = Reservation::where('location_id', $data['location_id'])
+                ->whereDate('reservation_date', $reservationDate) // Ensure the date is considered
+                ->where(function($query) use ($startTime, $endTime) {
+                    $query->whereBetween('reservation_start_time', [date('Y-m-d H:i', $startTime), date('Y-m-d H:i', $endTime)])
+                        ->orWhereBetween('reservation_end_time', [date('Y-m-d H:i', $startTime), date('Y-m-d H:i', $endTime)])
+                        ->orWhere(function($query) use ($startTime, $endTime) {
+                            $query->where('reservation_start_time', '<', date('Y-m-d H:i', $startTime))
+                                    ->where('reservation_end_time', '>', date('Y-m-d H:i', $endTime));
+                        });
+                })
+                ->exists();
+
+            if ($overlappingReservations) {
+                \Flash::error('The selected timeslot is already reserved. Please choose a different timeslot.');
+                return;
+            }
+
+            $reservation = new Reservation();
+            $reservation->customer_name = $data['name'];
+            $reservation->customer_email = $data['email'];
+            $reservation->location_id = $data['location_id'];
+            $reservation->reservation_date = $reservationDate->format('Y-m-d');
+            $reservation->reservation_start_time = date('H:i', $startTime);
+            $reservation->reservation_end_time = date('H:i', $endTime);
+
+            $reservation->save();
         }
-    
-        $reservation = new Reservation();
-        $reservation->customer_name = $customer_name;
-        $reservation->customer_email = $customer_email;
-        $reservation->location_id = $location_id;
-        $reservation->reservation_date = date('Y-m-d');
-        $reservation->reservation_start_time = date('H:i', $startTime);
-        $reservation->reservation_end_time = date('H:i', $endTime);
-        $reservation->reservation_date = $data['date']; // Use the date from the form data
-    
-        $reservation->save();
     
         \Flash::success('Reservation successfully made!');
         return \Redirect::to('/calendar/timeslots/' . $data['location_id'] . '?date=' . $data['date']);
