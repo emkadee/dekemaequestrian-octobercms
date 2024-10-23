@@ -1,0 +1,27 @@
+# ===================================
+#  List Column Definitions
+# ===================================
+
+columns:
+    id:
+        label: ID
+        searchable: true
+    customer_name:
+        label: Customer Name
+        searchable: true
+    customer_email:
+        label: Customer Email
+        searchable: true
+    reservation_date:
+        label: Reservation Date
+        searchable: true
+    reservation_start_time:
+        label: Reservation Start time
+        searchable: true
+    reservation_end_time:
+        label: Reservation End time
+        searchable: true
+    location:
+        label: Location
+        relation: location
+        select: name

@@ -1,0 +1,355 @@
+body {
+  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #33312B; }
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Ysabeau";
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  color: #33312B; }
+
+h1.page-title {
+  padding: 1em 0 0 0.5em;
+  margin-bottom: 0;
+  font-family: "Ysabeau SC" !important;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 2em;
+  color: #F0C523 !important; }
+
+/* BASIC BUTTON ELEMENT */
+a {
+  color: #F0C523;
+  text-decoration: underline;
+  -webkit-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  -o-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+
+a:hover {
+  color: darken #BFA541, 10% !important; }
+
+.footer {
+  padding: 2em;
+  flex-wrap: nowrap; }
+  .footer a {
+    color: #fff !important;
+    text-decoration: none;
+    font-family: "Ysabeau";
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 0.9em; }
+  .footer a:hover {
+    color: #F0C523 !important; }
+  .footer h4 {
+    font-family: "Ysabeau SC";
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1.2em;
+    color: #F0C523 !important; }
+  .footer ul {
+    padding: 0; }
+  .footer li {
+    list-style-type: none; }
+
+@media screen and (max-width: 768px) {
+  .footer div {
+    flex-flow: column wrap !important;
+    width: 100%; } }
+/* BUTTON ANIMATIONS */
+.btn {
+  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 1.1rem;
+  width: 100%;
+  border: 1px solid;
+  margin-right: 1em;
+  margin-bottom: 0.5em;
+  -webkit-transition: all 0.15s ease-in-out;
+  -o-transition: all 0.15s ease-in-out;
+  transition: all 0.15s ease-in-out; }
+
+.btn:hover {
+  -webkit-transform: scale(0.97);
+  -ms-transform: scale(0.97);
+  transform: scale(0.97);
+  -webkit-transform-origin: 50%;
+  -ms-transform-origin: 50%;
+  transform-origin: 50%; }
+
+.bg_pri {
+  background-color: #F0C523;
+  color: #33312B; }
+  .bg_pri .card {
+    border: 1px #d2a90e solid !important;
+    border-color: #ac8a0c;
+    background-color: #fbf1ca; }
+    .bg_pri .card .card-footer {
+      background-color: #fbf1ca; }
+
+.bg_sec {
+  background-color: #EAA044;
+  color: #33312B; }
+  .bg_sec .card {
+    border: 1px #e28819 solid !important;
+    border-color: #bd7215;
+    background-color: #fcf2e4; }
+    .bg_sec .card .card-footer {
+      background-color: #fcf2e4; }
+
+.bg_ter {
+  background-color: #8C7F4F;
+  color: #fff; }
+  .bg_ter .card {
+    border: 1px #6b613d solid !important;
+    border-color: #514a2e;
+    background-color: #d6d0b7; }
+    .bg_ter .card .card-footer {
+      background-color: #d6d0b7; }
+
+.bg_qua {
+  background-color: #595544;
+  color: #fff; }
+  .bg_qua .card {
+    border: 1px #3c392e solid !important;
+    border-color: #25231c;
+    background-color: #b3af9c; }
+    .bg_qua .card .card-footer {
+      background-color: #b3af9c; }
+
+.bg_qui {
+  background-color: #33312B;
+  color: #fff; }
+  .bg_qui .card {
+    border: 1px #171614 solid !important;
+    border-color: #010101;
+    background-color: #928d7e; }
+    .bg_qui .card .card-footer {
+      background-color: #928d7e; }
+
+.bg_whi {
+  background-color: #fff;
+  color: #33312B; }
+  .bg_whi .card {
+    border: 1px #e6e6e6 solid !important;
+    border-color: #d1d1d1;
+    background-color: white; }
+    .bg_whi .card .card-footer {
+      background-color: white; }
+
+.btn-pri {
+  background-color: #F0C523;
+  border-color: #d2a90e !important;
+  color: #33312B; }
+
+.btn-pri:hover {
+  background-color: #d2a90e;
+  border-color: #d2a90e !important;
+  color: #33312B; }
+
+.btn-pri:active {
+  background-color: #fff;
+  border-color: #d2a90e !important;
+  color: #e0e0e0 !important; }
+
+.btn-sec {
+  background-color: #EAA044;
+  border-color: #e28819 !important;
+  color: #33312B; }
+
+.btn-sec:hover {
+  background-color: #e28819;
+  border-color: #e28819 !important;
+  color: #33312B; }
+
+.btn-sec:active {
+  background-color: #fff;
+  border-color: #e28819 !important;
+  color: #e0e0e0 !important; }
+
+.btn-ter {
+  background-color: #8C7F4F;
+  border-color: #6b613d !important;
+  color: #fff; }
+
+.btn-ter:hover {
+  background-color: #6b613d;
+  border-color: #6b613d !important;
+  color: #fff; }
+
+.btn-ter:active {
+  background-color: #fff;
+  border-color: #6b613d !important;
+  color: #e0e0e0 !important; }
+
+.btn-qua {
+  background-color: #595544;
+  border-color: #3c392e !important;
+  color: #fff; }
+
+.btn-qua:hover {
+  background-color: #3c392e;
+  border-color: #3c392e !important;
+  color: #fff; }
+
+.btn-qua:active {
+  background-color: #fff;
+  border-color: #3c392e !important;
+  color: #e0e0e0 !important; }
+
+.btn-qui {
+  background-color: #33312B;
+  border-color: #171614 !important;
+  color: #fff; }
+
+.btn-qui:hover {
+  background-color: #171614;
+  border-color: #171614 !important;
+  color: #fff; }
+
+.btn-qui:active {
+  background-color: #fff;
+  border-color: #171614 !important;
+  color: #e0e0e0 !important; }
+
+.btn-whi {
+  background-color: #fff;
+  border-color: #e6e6e6 !important;
+  color: #33312B; }
+
+.btn-whi:hover {
+  background-color: #e6e6e6;
+  border-color: #e6e6e6 !important;
+  color: #33312B; }
+
+.btn-whi:active {
+  background-color: #fff;
+  border-color: #e6e6e6 !important;
+  color: #e0e0e0 !important; }
+
+.btn-quinary-darken {
+  background-color: #25241f !important;
+  border-color: #25241f !important;
+  color: #fff; }
+
+.btn-quinary-darken:hover {
+  background-color: #12110f !important;
+  border-color: #12110f !important;
+  color: #fff; }
+
+.btn-quinary-darken:active {
+  background-color: #fff;
+  border-color: #12110f !important;
+  color: #12110f !important; }
+
+/* NAVBAR */
+.navbar {
+  font-family: "Ysabeau", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal; }
+
+a.navbar-brand {
+  font-family: "Ysabeau SC";
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.9em; }
+
+a.navbar-brand img {
+  margin-top: -4px;
+  height: 38px; }
+
+.navbar-toggler {
+  border: 0; }
+
+.navbar-toggler:focus,
+.navbar-toggler:active,
+.navbar-toggler-icon:focus {
+  outline: none;
+  box-shadow: none; }
+
+.custom-toggler {
+  margin-top: 7px; }
+
+.custom-toggler .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(243, 199, 39)' stroke-linecap='round' stroke-miterlimit='12' stroke-width='3' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e"); }
+
+/* CARDS */
+div:has(> .d-flex) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  align-items: stretch; }
+
+.card {
+  margin: 1em;
+  text-align: center;
+  flex: 0.8;
+  max-width: 320px; }
+  .card .card-title {
+    font-size: calc(1.6rem + 0.2vw); }
+  .card img {
+    width: 50%; }
+  .card .btn {
+    font-size: 0.9em !important;
+    margin-right: 0.6em !important;
+    margin-bottom: 0em !important;
+    padding: 0.4em !important; }
+  .card p.card-text {
+    font-size: calc(0.8rem + 0.2vw); }
+  .card .card-footer {
+    border: 0;
+    background-color: #fff; }
+
+.simple,
+.textimage {
+  margin: 1em;
+  text-align: center;
+  flex: 1; }
+  .simple img.block-img,
+  .textimage img.block-img {
+    width: 50%; }
+  .simple p,
+  .textimage p {
+    font-size: calc(0.8rem + 0.2vw); }
+  .simple a,
+  .simple h4,
+  .textimage a,
+  .textimage h4 {
+    color: #33312B !important;
+    text-decoration: none; }
+
+@media screen and (max-width: 768px) {
+  div:has(> .d-flex) {
+    flex-wrap: wrap; }
+
+  .card {
+    width: 100%;
+    flex: auto; }
+    .card .btn {
+      width: auto;
+      padding: 0.4em 0.8em !important; }
+
+  .simple,
+  .textimage {
+    width: 100%;
+    flex: auto; } }
+.min_height {
+  min-height: 300px; }
+
+.divheight_26 {
+  height: 26px; }
+
+.divheight_10 {
+  height: 10px; }
+
+/*# sourceMappingURL=style.css.map */

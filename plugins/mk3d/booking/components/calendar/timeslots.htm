@@ -1,0 +1,90 @@
+{{ date }}
+{{ location_id}}
+<script>
+$(document).ready(function() {
+        // Initialize reservation form modal
+        initializeReservationForm();
+        });
+</script>
+
+{% if matchReservationsWithTimeSlots is not empty %}
+<div class="row timeslots">
+    <div class="col-md-4">  
+        <h2>Ochtend</h2>
+        
+        {% if matchReservationsWithTimeSlots.morning is not empty %}
+            <ul>
+                {% for slot in matchReservationsWithTimeSlots.morning %}
+                    {% if slot.reserved %}
+                        <li class="reserved">{{ slot.time }} uur</li>
+                    {% else %}
+                        <li class="available">
+                            <a href="#" class="open-reservation-form" data-time="{{ slot.time }}" data-location="{{ location_id }}" data-date="{{ date }}">{{ slot.time }} uur</a>  
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No morning time slots found for this location.</p>
+        {% endif %}
+    </div>
+    <div class="col-md-4">  
+        <h2>Middag</h2>
+        {% if matchReservationsWithTimeSlots.daytime is not empty %}
+            <ul>
+                {% for slot in matchReservationsWithTimeSlots.daytime %}
+                    {% if slot.reserved %}
+                        <li class="reserved">{{ slot.time }} uur</li>
+                    {% else %}
+                        <li class="available">
+                            <a href="#" class="open-reservation-form" data-time="{{ slot.time }}" data-location="{{ location_id }}" data-date="{{ date }}">{{ slot.time }} uur</a>  
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No daytime time slots found for this location.</p>
+        {% endif %}
+    </div>
+    <div class="col-md-4">  
+        <h2>Avond</h2>
+        {% if matchReservationsWithTimeSlots.evening is not empty %}
+            <ul>
+                {% for slot in matchReservationsWithTimeSlots.evening %}
+                    {% if slot.reserved %}
+                        <li class="reserved">{{ slot.time }} uur</li>
+                    {% else %}
+                        <li class="available">
+                            <a href="#" class="open-reservation-form" data-time="{{ slot.time }}" data-location="{{ location_id }}" data-date="{{ date }}">{{ slot.time }} uur</a>  
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No evening time slots found for this location.</p>
+        {% endif %}
+    </div>
+{% else %}
+    <p>No time slots found for this location.</p>
+{% endif %}   
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

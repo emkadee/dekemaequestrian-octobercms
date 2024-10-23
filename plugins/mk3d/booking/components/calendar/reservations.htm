@@ -1,0 +1,16 @@
+<h1>Reservations by Location from reservation.htm</h1>
+
+{% if BookingCalendar.reservations is not empty %}
+    <ul>
+        {% for reservation in BookingCalendar.reservations %}
+
+                <strong>ID:</strong> {{ reservation.id }}<br>
+                <strong>Start Time:</strong> {{ reservation.reservation_start_time }}<br>
+                <strong>End Time:</strong> {{ reservation.reservation_end_time }}<br>
+                <strong>Location:</strong> {{ reservation.location.name }}
+            <br />
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No reservations found.</p>
+{% endif %}

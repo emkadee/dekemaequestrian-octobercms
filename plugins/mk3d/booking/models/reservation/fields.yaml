@@ -1,0 +1,32 @@
+# ===================================
+#  Form Field Definitions
+# ===================================
+
+fields:
+    id:
+        label: ID
+        disabled: true
+    customer_name:
+        label: Customer Name
+        searchable: true
+    customer_email:
+        label: Customer Email
+        searchable: true
+    reservation_date:
+        label: Reservation Date
+        searchable: true
+        type: datepicker
+        mode: date
+    reservation_start_time:
+        label: Reservation Start Time
+        type: datepicker
+        mode: time
+    reservation_end_time:
+        label: Reservation End Time
+        type: datepicker
+        mode: time
+    location:
+        label: Location
+        searchable: true
+        type: recordfinder
+        list: $/mk3d/booking/models/location/columns.yaml

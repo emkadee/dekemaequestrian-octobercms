@@ -1,0 +1,10 @@
+name: Blocks
+form: $/mk3d/contentblocks/models/block/fields.yaml
+modelClass: Mk3d\Contentblocks\Models\Block
+defaultRedirect: mk3d/contentblocks/blocks
+create:
+    redirect: 'mk3d/contentblocks/blocks/update/:id'
+    redirectClose: mk3d/contentblocks/blocks
+update:
+    redirect: mk3d/contentblocks/blocks
+    redirectClose: mk3d/contentblocks/blocks

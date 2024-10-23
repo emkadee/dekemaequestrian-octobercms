@@ -1,0 +1,16 @@
+plugin:
+    name: 'mk3d.contentblocks::lang.plugin.name'
+    description: 'mk3d.contentblocks::lang.plugin.description'
+    author: MK3D
+    icon: oc-icon-credit-card
+    homepage: ''
+navigation:
+    main-menu-content:
+        label: Blocks
+        url: mk3d/contentblocks/blocks
+        icon: icon-credit-card
+        iconSvg: ''
+permissions:
+    'Edit blocks':
+        tab: 'mk3d.contentblocks::lang.plugin.name'
+        label: 'mk3d.contentblocks::lang.plugin.name'

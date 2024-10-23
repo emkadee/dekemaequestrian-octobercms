@@ -1,0 +1,22 @@
+url = "/calendar/locations/:location_id"
+layout = "calendar"
+title = "Hours available"
+
+[BookingCalendar] 
+location_id = "{{ :location_id }}"
+==
+{% component "BookingCalendar::locations" %}
+
+<h1>Locations by Location from reservation.htm</h1>
+
+{% set locationTimes = BookingCalendar.locations %}
+
+{% if locationTimes is not empty %}
+    <ul>
+        {% for time in locationTimes %}
+            <li>{{ time }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No times found for this location.</p>
+{% endif %}

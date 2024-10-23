@@ -1,0 +1,9 @@
+# config_relation.yaml
+items:
+  label: Location
+  view:
+    list: $/mk3d/booking/models/location/columns.yaml
+    recordsPerPage: 10
+  manage:
+    form: $/mk3d/booking/models/location/fields.yaml
+    list: $/mk3d/booking/models/location/columns.yaml

@@ -1,0 +1,18 @@
+fields:
+    title:
+        label: Title
+        span: auto
+        type: text
+    image:
+        label: 'Media Finder'
+        mode: file
+        thumbOptions:
+            mode: crop
+            extension: auto
+        span: auto
+        type: mediafinder
+    description:
+        label: Description
+        size: ''
+        span: full
+        type: textarea

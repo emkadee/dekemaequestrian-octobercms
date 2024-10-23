@@ -1,0 +1,12 @@
+list: $/mk3d/contentblocks/models/block/columns.yaml
+modelClass: Mk3d\Contentblocks\Models\Block
+title: Blocks
+noRecordsMessage: 'backend::lang.list.no_records'
+showSetup: true
+showCheckboxes: true
+recordsPerPage: 20
+toolbar:
+    buttons: list_toolbar
+    search:
+        prompt: 'backend::lang.list.search_prompt'
+recordUrl: 'mk3d/contentblocks/blocks/update/:id'

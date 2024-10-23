@@ -1,0 +1,9 @@
+name: 'Dekema Equestrian'
+description: 'Custom theme generated for http://localhost/dekema'
+author: 'Menne Kees Dijkstra'
+homepage: 'http://localhost/dekema'
+code: dekeq
+form:
+    fields:
+        googleanalytics_id:
+            label: 'Google Analytics ID'

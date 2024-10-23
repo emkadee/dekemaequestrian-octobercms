@@ -1,0 +1,104 @@
+description = "Default layout"
+
+[staticMenu]
+code = "staticMenu"
+
+[staticPage]
+useContent = 1
+default = 0
+
+[contentBlock]
+link_text = "Lees meer"
+==
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{{ this.page.meta_title ?: placeholder('pageTitle') }}</title>
+        <meta name="description" content="{{ this.page.meta_description }}">            
+        {% partial 'site/head-links' %}
+    </head>
+
+    <body class="{{ 'page-'~this.page.id }}">    
+        <div class="container-fluid bg_pri divheight_26"></div>        
+        <div class="container-fluid bg_whi">
+            {% partial 'site/navigation' %}      
+        </div>
+        <div class="container-fluid bg_qui divheight_10 clear"></div>  
+        <div class="container-fluid bg_ter">
+        
+            <div class="container-lg">
+                <div class"row">
+                    <h1 class="page-title">
+                        {% if this.page.meta_title %}
+                            {{ this.page.meta_title }}</h1>
+                        {% else %}
+                            {{ this.page.title }}</h1>
+                        {% endif %}
+                </div>
+            </div>
+            <div class="container-lg">                
+                <div class="row p-3">
+                    <div class="col-md-6">
+                            {% page %} 
+                    </div>
+                    <div class="col-md-6">
+                        {% placeholder right title="ContentRight" %}
+                    </div> 
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid bg__whi p-3"></div>
+
+        {% if placeholder('yellowrow') %}
+        <div class="container-fluid bg_pri">
+            <div class="container-lg">
+                {% placeholder yellowrow title="Yellow row" %}
+            </div>
+        </div>
+        <div class="container-fluid bg__whi p-3"></div>
+        {% endif %}
+
+        {% if placeholder('content2') %}
+        <div class="container-fluid bg_whi">
+            <div class="container-lg">            
+                <div class="row p-3">
+                    <div class="col-md-6">
+                        {% placeholder content2 title="Content2" %}
+                    </div>
+                    <div class="col-md-6">
+                        {% placeholder contentright2 title="ContentRight2" %}
+                    </div> 
+                </div>            
+            </div>
+        </div>
+         {% endif %}       
+
+
+
+        {% if placeholder('orangerow') %}
+        <div class="container-fluid bg_sec">
+            <div class="container-lg">
+                {% placeholder orangerow title="Orange row" %}
+            </div>
+        </div>
+        <div class="container-fluid bg__whi p-3"></div>
+        {% endif %}
+
+        
+        <div class="container-fluid bg_qui">
+            <div class="container-lg footer d-flex">
+                <div class="d-flex"><div>{% content 'footer_1.htm' %}</div></div>
+                <div class="d-flex"><div>{% content 'footer_2.htm' %}</div></div>
+                <div class="d-flex"><div>{% content 'footer_3.htm' %}</div></div>
+                <div class="d-flex"><div>{% content 'footer_4.htm' %}</div></div>
+                <div class="d-flex"><div>{% content 'footer_5.htm' %}</div></div>
+            </div>
+        </div>
+        
+        {% partial 'site/body-scripts' %} 
+  
+
+    </body>
+</html>

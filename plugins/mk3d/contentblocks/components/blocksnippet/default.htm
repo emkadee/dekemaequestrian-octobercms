@@ -1,0 +1,42 @@
+
+{% if contentBlock is not empty %}
+
+    {% if blockStyle == 'simple' %}
+        <div class="simple d-flex p-2">
+            <a href="{{ staticPageUrl }}">
+            <div>                
+                <img src="{{ contentBlock.image | media}}" class="block-img" alt="{{ contentBlock.title }}">
+                <p>{{ contentBlock.description|slice(0, 50)}}...  {{ linkText }}</p>            
+            </div>
+            </a>
+        </div>
+    {% endif %}
+
+    {% if blockStyle == 'textimage' %}
+        div class="textimage d-flex p-2">
+            <h5>{{ contentBlock.title }}</h5>
+            <img src="{{ contentBlock.image | media}}" class="block-img" alt="{{ contentBlock.title }}">
+            <p>{{ contentBlock.description }}</p><a href="{{ staticPageUrl }}" class="btn btn-pri">{{ linkText }}</a>            
+        </div>
+    </div>
+    {% endif %}
+
+    {% if blockStyle == 'card' %}
+        <div class="card d-flex  p-2">
+            <div class="card-body">
+                <h5 class="card-title">{{ contentBlock.title }}</h5>
+                <img src="{{ contentBlock.image | media}}" class="card-img-top" alt="{{ contentBlock.title }}">
+                <p class="card-text">{{ contentBlock.description }}</p>
+                
+            </div>
+            <div class="card-footer">
+                <a href="{{ staticPageUrl }}" class="btn btn-pri">{{ linkText }}</a>
+            </div>
+        </div>
+    {% endif %}
+
+{% else %}
+    <p>No contentblock items found.</p>
+{% endif %}
+
+

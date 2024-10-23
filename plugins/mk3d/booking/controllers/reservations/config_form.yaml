@@ -1,0 +1,31 @@
+# ===================================
+#  Form Behavior Config
+# ===================================
+
+# Record name
+name: Reservation
+
+# Model Form Field configuration
+form: $/mk3d/booking/models/reservation/fields.yaml
+
+# Model Class name
+modelClass: Mk3d\Booking\Models\Reservation
+
+# Default redirect location
+defaultRedirect: mk3d/booking/reservations
+
+# Create page
+create:
+    title: backend::lang.form.create_title
+    redirect: mk3d/booking/reservations/update/:id
+    redirectClose: mk3d/booking/reservations
+
+# Update page
+update:
+    title: backend::lang.form.update_title
+    redirect: mk3d/booking/reservations
+    redirectClose: mk3d/booking/reservations
+
+# Preview page
+preview:
+    title: backend::lang.form.preview_title

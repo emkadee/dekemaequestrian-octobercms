@@ -1,0 +1,87 @@
+@each $colorName, $color in $colors {
+
+    .bg_#{$colorName} {
+        background-color: $color;
+
+        @if (lightness($color)<50) {
+            // fails with > 50 or < 50
+            color: #fff;
+        }
+
+        @else {
+            color: $quiColor;
+        }
+
+        .card {
+            border: 1px darken($color, 10) solid !important;
+            border-color: darken($color, 18);
+            background-color: lighten($color, 35);
+
+            .card-footer {
+                background-color: lighten($color, 35);
+            }
+        }
+    }
+}
+
+
+@each $colorName, $color in $colors {
+
+    .btn-#{$colorName} {
+        background-color: $color;
+        border-color: darken($color, 10) !important;
+
+        @if (lightness($color)<50) {
+            // fails with > 50 or < 50
+            color: #fff;
+        }
+
+        @else {
+            color: $quiColor;
+        }
+    }
+
+    .btn-#{$colorName}:hover {
+        background-color: darken($color, 10);
+        border-color: darken($color, 10) !important;
+
+        @if (lightness($color)<50) {
+            // fails with > 50 or < 50
+            color: #fff;
+        }
+
+        @else {
+            color: $quiColor;
+        }
+    }
+
+    .btn-#{$colorName}:active {
+        background-color: #fff;
+        border-color: darken($color, 10) !important;
+        color: #e0e0e0 !important;
+    }
+
+}
+
+
+
+
+
+
+.btn-quinary-darken {
+    background-color: #25241f !important;
+    border-color: #25241f !important;
+    color: #fff;
+}
+
+.btn-quinary-darken:hover {
+    background-color: #12110f !important;
+    border-color: #12110f !important;
+    color: #fff;
+}
+
+.btn-quinary-darken:active {
+    background-color: #fff;
+    border-color: #12110f !important;
+    color: #12110f !important;
+}

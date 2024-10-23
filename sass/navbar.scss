@@ -1,0 +1,39 @@
+/* NAVBAR */
+.navbar {
+    font-family: "Ysabeau", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+}
+
+a.navbar-brand {
+    font-family: "Ysabeau SC";
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1.9em;
+}
+
+a.navbar-brand img {
+    margin-top: -4px;
+    height: 38px;
+}
+
+.navbar-toggler {
+    border: 0;
+}
+
+.navbar-toggler:focus,
+.navbar-toggler:active,
+.navbar-toggler-icon:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.custom-toggler {
+    margin-top: 7px;
+}
+
+.custom-toggler .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(243, 199, 39)' stroke-linecap='round' stroke-miterlimit='12' stroke-width='3' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}

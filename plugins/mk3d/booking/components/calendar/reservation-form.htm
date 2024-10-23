@@ -1,0 +1,33 @@
+
+<h1>Reservation Form {{ location_id }} </h1>
+
+<form data-request="onSubmitReservation">
+    <input type="hidden" name="time" value="{{ input('time') }}">
+    <input type="hidden" name="location_id" value="{{ input('location_id') }}">
+    
+    <div class="form-group">
+        <label for="name" class="label-custom">Name</label>
+        <input type="text" name="name" id="name" class="form-control" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="email" class="label-custom">Email</label>
+        <input type="email" name="email" id="email" class="form-control" required>
+    </div>
+
+    <div class="form-group">
+        <label for="reservation_date" class="label-custom">Datum</label>
+        <input type="date" name="reservation_date" id="reservation_date" class="form-control" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="duration" class="label-custom">Aantal uur</label>
+        <input type="number" name="duration" id="duration" class="form-control" required>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Submit Reservation</button>
+</form>
+
+
+
+
