@@ -1,0 +1,21 @@
+url = "/login"
+layout = "default"
+title = "Login"
+
+[session]
+security = "all"
+checkToken = 0
+
+[account]
+isDefault = 0
+
+[authentication]
+rememberMe = "never"
+twoFactorAuth = 1
+recoverPassword = 1
+
+[registration]
+==
+{% component "registration" %}
+
+{% component "authentication" %}
