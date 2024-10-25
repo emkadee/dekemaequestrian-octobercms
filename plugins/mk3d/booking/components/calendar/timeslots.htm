@@ -27,10 +27,14 @@ $(document).ready(function() {
             <ul>
                 {% for slot in matchReservationsWithTimeSlots.morning %}
                     {% if slot.reserved %}
-                        <li class="reserved">{{ slot.time }} uur</li>
+                        <li class="reserved">{{ slot.time }} uur - Gereserveerd</li>
                     {% else %}
                         <li class="available">
-                            <a href="#" class="open-reservation-form" data-time="{{ slot.time }}" data-location="{{ location_id }}" data-date="{{ date }}">{{ slot.time }} uur</a>  
+                            {% if slot.passed %}
+                                <div class="passed">{{ slot.time }} uur</div>
+                            {% else %}
+                                <a href="#" class="open-reservation-form" data-time="{{ slot.time }}" data-location="{{ location_id }}" data-date="{{ date }}">{{ slot.time }} uur - Beschikbaar</a>  
+                            {% endif %}
                         </li>
                     {% endif %}
                 {% endfor %}
@@ -45,10 +49,14 @@ $(document).ready(function() {
             <ul>
                 {% for slot in matchReservationsWithTimeSlots.daytime %}
                     {% if slot.reserved %}
-                        <li class="reserved">{{ slot.time }} uur</li>
+                        <li class="reserved">{{ slot.time }} uur - Gereserveerd</li>
                     {% else %}
                         <li class="available">
-                            <a href="#" class="open-reservation-form" data-time="{{ slot.time }}" data-location="{{ location_id }}" data-date="{{ date }}">{{ slot.time }} uur</a>  
+                            {% if slot.passed %}
+                                <div class="passed">{{ slot.time }} uur</div>
+                            {% else %}
+                                <a href="#" class="open-reservation-form" data-time="{{ slot.time }}" data-location="{{ location_id }}" data-date="{{ date }}">{{ slot.time }} uur - Beschikbaar</a>  
+                            {% endif %}
                         </li>
                     {% endif %}
                 {% endfor %}
@@ -63,10 +71,14 @@ $(document).ready(function() {
             <ul>
                 {% for slot in matchReservationsWithTimeSlots.evening %}
                     {% if slot.reserved %}
-                        <li class="reserved">{{ slot.time }} uur</li>
+                        <li class="reserved">{{ slot.time }} uur - Gereserveerd</li>
                     {% else %}
                         <li class="available">
-                            <a href="#" class="open-reservation-form" data-time="{{ slot.time }}" data-location="{{ location_id }}" data-date="{{ date }}">{{ slot.time }} uur</a>  
+                            {% if slot.passed %}
+                                <div class="passed">{{ slot.time }} uur</div>
+                            {% else %}
+                                <a href="#" class="open-reservation-form" data-time="{{ slot.time }}" data-location="{{ location_id }}" data-date="{{ date }}">{{ slot.time }} uur - Beschikbaar</a>  
+                            {% endif %}
                         </li>
                     {% endif %}
                 {% endfor %}

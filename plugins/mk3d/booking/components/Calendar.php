@@ -7,6 +7,7 @@ use Log;
 use Input;
 use Validator;
 use ValidationException;
+use Mail;
 
 
 
@@ -133,33 +134,19 @@ class Calendar extends ComponentBase
         $startTime = strtotime($time);
         $endTime = strtotime('+' . ($duration * 60) . ' minutes', $startTime);
         $endTime = strtotime('-1 minute', $endTime);
-    
-/*         // Check for overlapping reservations
-        $overlappingReservations = Reservation::where('location_id', $location_id)
-            ->whereDate('reservation_date', $date) // Ensure the date is considered
-            ->where(function($query) use ($startTime, $endTime) {
-                $query->whereBetween('reservation_start_time', [date('Y-m-d H:i', $startTime), date('Y-m-d H:i', $endTime)])
-                    ->orWhereBetween('reservation_end_time', [date('Y-m-d H:i', $startTime), date('Y-m-d H:i', $endTime)])
-                    ->orWhere(function($query) use ($startTime, $endTime) {
-                        $query->where('reservation_start_time', '<', date('Y-m-d H:i', $startTime))
-                                ->where('reservation_end_time', '>', date('Y-m-d H:i', $endTime));
-                    });
-            })
-            ->exists();
-    
-        if ($overlappingReservations) {
-            \Flash::error('The selected timeslot is already reserved. Please choose a different timeslot.');
-            return;
-        } */
-    
+
+        // Store all reservation dates for the email
+        $reservationDates = [];
+
+
         // Create reservations
         for ($i = 0; $i < $recurringCount; $i++) {
             $reservationDate = clone $startDate;
             $reservationDate->modify("+" . ($i * $interval) . " weeks");
 
             $startTime = strtotime($reservationDate->format('Y-m-d') . ' ' . $time);
-            $endTime = $startTime + ($data['duration'] * 3600);
-
+            $endTime = $startTime + ($data['duration'] * 3600);               
+            
             // Check for overlapping reservations
             $overlappingReservations = Reservation::where('location_id', $data['location_id'])
                 ->whereDate('reservation_date', $reservationDate) // Ensure the date is considered
@@ -187,8 +174,29 @@ class Calendar extends ComponentBase
             $reservation->reservation_end_time = date('H:i', $endTime);
 
             $reservation->save();
+            
+            // Add the reservation date to the list for the email
+            $reservationDates[] = [
+                'date' => $reservationDate->format('Y-m-d'),
+                'time' => date('H:i', $startTime),
+            ];
         }
-    
+
+        // Send confirmation email to the user
+        $location = Location::find($data['location_id']);
+
+        $emailData = [
+            'name' => Input::get('name'),
+            'email' => Input::get('email'),
+            'reservation_dates' => $reservationDates,
+            'location_name' => $location ? $location->name : 'Unknown Location', 
+        ];
+
+        Mail::send('mk3d.booking::mail.reservation_confirmation', $emailData, function($message) use ($data) {
+            $message->to(Input::get('email'), Input::get('name'));
+            $message->subject('Reservation Confirmation');
+        });
+        
         \Flash::success('Reservation successfully made!');
         return \Redirect::to('/calendar/timeslots/' . $data['location_id'] . '?date=' . $data['date']);
     }
@@ -215,7 +223,7 @@ class Calendar extends ComponentBase
         return $reservations;
     } 
 
-    public function generateTimeSlots()
+    public function generateTimeSlots($date)
     {
         $locationId = $this->property('location_id');
         Log::info('Location ID: ' . $locationId);
@@ -244,24 +252,34 @@ class Calendar extends ComponentBase
         Log::info('Opening Time: ' . $locationSelected->opening_time . ' (' . $openingTime . ')');
         Log::info('Closing Time: ' . $locationSelected->closing_time . ' (' . $closingTime . ')');
 
+        // Get the current date and time
+        $now = new \DateTime();
+
         for ($time = $openingTime; $time < $closingTime; $time = strtotime('+30 minutes', $time)) {
             $formattedTime = date("H:i", $time);
             $hour = date("H", $time);
 
+            // Check if the time slot is in the past
+            $slotDateTime = new \DateTime($date . ' ' . $formattedTime);
+            $dateTimePassed = $slotDateTime < $now;
+
             if ($hour < 12) {
                 $timeSlotsGenerated['morning'][] = [
                     'time' => $formattedTime,
-                    'reserved' => false
+                    'reserved' => false,
+                    'passed' => $dateTimePassed
                 ];
             } elseif ($hour < 18) {
                 $timeSlotsGenerated['daytime'][] = [
                     'time' => $formattedTime,
-                    'reserved' => false
+                    'reserved' => false,
+                    'passed' => $dateTimePassed
                 ];
             } else {
                 $timeSlotsGenerated['evening'][] = [
                     'time' => $formattedTime,
-                    'reserved' => false
+                    'reserved' => false,
+                    'passed' => $dateTimePassed
                 ];
             }
         }
@@ -274,7 +292,7 @@ class Calendar extends ComponentBase
     public function matchReservationsWithTimeSlots($date = null, $locationId = null)
     {
         $reservations = $this->reservations($date, $locationId);
-        $matchReservationsWithTimeSlots = $this->generateTimeSlots();
+        $matchReservationsWithTimeSlots = $this->generateTimeSlots($date,);
 
         foreach ($matchReservationsWithTimeSlots as $period => &$slots) {
             foreach ($slots as &$slot) {

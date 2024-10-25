@@ -22,6 +22,18 @@ class Plugin extends PluginBase
             'icon' => 'icon-leaf'
         ];
     }
+    public function boot()
+    {
+        // Register the view namespace
+        \View::addNamespace('mk3d.booking', base_path() . '/plugins/mk3d/booking/views');
+    }
+
+    public function registerMailTemplates()
+    {
+        return [
+            'mk3d.booking::mail.reservation_confirmation' => 'Reservation confirmation email',
+        ];
+    }
 
     /**
      * register method, called when the plugin is first registered.
@@ -31,13 +43,7 @@ class Plugin extends PluginBase
         //
     }
 
-    /**
-     * boot method, called right before the request route.
-     */
-    public function boot()
-    {
-        //
-    }
+
 
     /**
      * registerComponents used by the frontend.
