@@ -52,6 +52,7 @@ class Plugin extends PluginBase
     {
         return [
             'Mk3d\Booking\Components\Calendar' => 'BookingCalendar',
+            'Mk3d\Booking\Components\Cancellation' => 'BookingCancellation',
         ];
     }
 

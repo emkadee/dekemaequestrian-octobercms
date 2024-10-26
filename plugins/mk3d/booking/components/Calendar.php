@@ -1,6 +1,7 @@
 <?php namespace Mk3d\Booking\Components;
 
 use Cms\Classes\ComponentBase;
+use Cms\Classes\Controller;
 use Mk3d\Booking\Models\Reservation;
 use Mk3d\Booking\Models\Location;
 use Log;
@@ -8,6 +9,7 @@ use Input;
 use Validator;
 use ValidationException;
 use Mail;
+use Config;
 
 
 
@@ -30,7 +32,7 @@ class Calendar extends ComponentBase
                 'description' => 'The ID of the location to display reservations for',
                 'type' => 'integer',
                 'default' => '{{ :location_id }}'
-            ]
+            ],
         ];
     }
 
@@ -38,6 +40,7 @@ class Calendar extends ComponentBase
     public $location_id;
     public $date;
     public $location_name;
+
 
 
     public function onRun()
@@ -48,9 +51,73 @@ class Calendar extends ComponentBase
         
         // Fetch the location name
         $location = Location::find($this->property('location_id'));
-        Log::info('Location : ' . $location->name);
-        $this->page['location_name'] = $location->name;
+
+        if ($location) {
+            Log::info('Location : ' . $location->name);
+            $this->page['location_name'] = $location->name;
+        }
+        
     }
+
+    public function reservations()
+    {
+        // Get the location ID from the URL
+        $locationId = $this->param('location_id');
+        Log::info('Location ID: ' . $locationId);
+
+        $date = input('date', date('Y-m-d'));
+
+        // Query reservations for the specific location
+        $reservations = Reservation::with('location')
+            ->where('location_id', $locationId)
+            ->whereDate('reservation_date', $date)
+            ->get();
+
+        Log::info('Reservations: ' . $reservations->toJson());
+
+        return $reservations;
+    }
+
+    public function locations(){
+        
+        $locationId = $this->property('location_id');
+        Log::info('Location ID: ' . $locationId);
+
+        $reservations = Reservation::with('location')
+            ->where('location_id', $locationId)
+            ->get();
+
+        $locationSelected = Location::find($locationId);
+
+        if (!$locationSelected) {
+            Log::error('Location not found.');
+            return [];
+        }
+
+        $locations = [];
+
+        $openingTime = strtotime($locationSelected->opening_time);
+        $closingTime = strtotime($locationSelected->closing_time);
+
+
+        // Adjust closing time if it is 00:00:00 to be the next day
+        if (date('H:i:s', $closingTime) == '00:00:00') {
+            $closingTime = strtotime('+1 day', $closingTime);
+        }
+    
+        Log::info('Opening Time: ' . $locationSelected->opening_time . ' (' . $openingTime . ')');
+        Log::info('Closing Time: ' . $locationSelected->closing_time . ' (' . $closingTime . ')');
+    
+        for ($time = $openingTime; $time <= $closingTime; $time = strtotime('+30 minutes', $time)) {
+            $locations[] = date("H:i", $time);
+        }
+    
+        Log::info('Location Times: ' . json_encode($locations));
+    
+        return $locations;        
+        
+    } 
+    
 
     public function onFilterTimeslots()
     {
@@ -94,6 +161,9 @@ class Calendar extends ComponentBase
         if ($validation->fails()) {
             throw new ValidationException($validation);
         }
+
+        // Generate a unique recurring group ID if not provided
+        $recurringGroupId = $data['recurring_group_id'] ?? uniqid('recurring_', true);
 
         
 
@@ -165,63 +235,55 @@ class Calendar extends ComponentBase
                 return;
             }
 
+            // Generate a unique cancellation token
+            $cancellationToken = uniqid('cancel_', true);    
+
             $reservation = new Reservation();
             $reservation->customer_name = $data['name'];
             $reservation->customer_email = $data['email'];
             $reservation->location_id = $data['location_id'];
+            $reservation->location = Location::find($data['location_id']);
             $reservation->reservation_date = $reservationDate->format('Y-m-d');
             $reservation->reservation_start_time = date('H:i', $startTime);
             $reservation->reservation_end_time = date('H:i', $endTime);
+            $reservation->recurring_group_id = $recurringGroupId; // Set the recurring group ID
+            $reservation->cancellation_token = $cancellationToken; // Set the cancellation token
 
             $reservation->save();
+
             
             // Add the reservation date to the list for the email
             $reservationDates[] = [
                 'date' => $reservationDate->format('Y-m-d'),
                 'time' => date('H:i', $startTime),
+                'end_time' => date('H:i', $endTime),
+                'cancellation_link' => url('/cancellation/' . $cancellationToken), // Include the cancellation token
             ];
         }
 
-        // Send confirmation email to the user
-        $location = Location::find($data['location_id']);
-
-        $emailData = [
-            'name' => Input::get('name'),
-            'email' => Input::get('email'),
-            'reservation_dates' => $reservationDates,
-            'location_name' => $location ? $location->name : 'Unknown Location', 
-        ];
-
-        Mail::send('mk3d.booking::mail.reservation_confirmation', $emailData, function($message) use ($data) {
-            $message->to(Input::get('email'), Input::get('name'));
-            $message->subject('Reservation Confirmation');
-        });
+        // Send the reservation confirmation email with the cancellation link
+        $this->sendReservationConfirmationEmail($data['email'], $data['name'], $reservationDates);
         
         \Flash::success('Reservation successfully made!');
-        return \Redirect::to('/calendar/timeslots/' . $data['location_id'] . '?date=' . $data['date']);
+        return \Redirect::to('/calendar/' . $data['location_id'] . '?date=' . $data['date']);
+    }
+
+    //SEND RESERVATION CONFIRMATION EMAIL
+    protected function sendReservationConfirmationEmail($email, $name, $reservationDates)
+    {
+        // Send the email (assuming you have a mail template set up)
+        Mail::send('mk3d.booking::mail.reservation_confirmation', ['name' => $name, 'reservation_dates' => $reservationDates], function($message) use ($email, $name) {
+            $message->to($email, $name);
+            $message->subject('Reservation Confirmation');
+        });
     }
 
 
 
 
-    public function reservations()
-    {
-        // Get the location ID from the URL
-        $locationId = $this->param('location_id');
-        Log::info('Location ID: ' . $locationId);
 
-        $date = input('date', date('Y-m-d'));
 
-        // Query reservations for the specific location
-        $reservations = Reservation::with('location')
-            ->where('location_id', $locationId)
-            ->whereDate('reservation_date', $date)
-            ->get();
 
-        Log::info('Reservations: ' . $reservations->toJson());
-
-        return $reservations;
-    } 
 
     public function generateTimeSlots($date)
     {
@@ -324,49 +386,6 @@ class Calendar extends ComponentBase
         return $matchReservationsWithTimeSlots;
     }
 
-
-
-
-
-    public function locations(){
-        
-        $locationId = $this->property('location_id');
-        Log::info('Location ID: ' . $locationId);
-
-        $reservations = Reservation::with('location')
-            ->where('location_id', $locationId)
-            ->get();
-
-        $locationSelected = Location::find($locationId);
-
-        if (!$locationSelected) {
-            Log::error('Location not found.');
-            return [];
-        }
-
-        $locations = [];
-
-        $openingTime = strtotime($locationSelected->opening_time);
-        $closingTime = strtotime($locationSelected->closing_time);
-
-
-        // Adjust closing time if it is 00:00:00 to be the next day
-        if (date('H:i:s', $closingTime) == '00:00:00') {
-            $closingTime = strtotime('+1 day', $closingTime);
-        }
-    
-        Log::info('Opening Time: ' . $locationSelected->opening_time . ' (' . $openingTime . ')');
-        Log::info('Closing Time: ' . $locationSelected->closing_time . ' (' . $closingTime . ')');
-    
-        for ($time = $openingTime; $time <= $closingTime; $time = strtotime('+30 minutes', $time)) {
-            $locations[] = date("H:i", $time);
-        }
-    
-        Log::info('Location Times: ' . json_encode($locations));
-    
-        return $locations;        
-        
-    } 
 
 
 }

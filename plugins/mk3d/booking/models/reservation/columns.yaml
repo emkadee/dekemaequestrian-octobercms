@@ -25,3 +25,7 @@ columns:
         label: Location
         relation: location
         select: name
+    recurring_group_id:
+        label: Recurring ID
+        sortable: true
+        searchable: true

@@ -1,0 +1,9 @@
+url = "/cancellation/:cancellation_token"
+layout = "booking"
+title = "Cancel Reservation"
+is_hidden = 0
+
+[BookingCancellation]
+cancellation_token = "{{ :cancellation_token }}"
+==
+{% component 'BookingCancellation::cancelreservation' %}

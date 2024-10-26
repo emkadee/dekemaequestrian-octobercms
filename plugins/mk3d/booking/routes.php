@@ -6,5 +6,4 @@ Route::get('/reservations', function () {
 
 
 
-
 ?>

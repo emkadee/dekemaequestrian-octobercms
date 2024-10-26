@@ -25,7 +25,9 @@ class Reservation extends Model
         'reservation_date' => 'required', 'date',
         'reservation_start_time' => 'required', 'time',
         'reservation_end_time' => 'required', 'time',
-        'location_id' => 'required', 'integer'
+        'location_id' => 'required', 'integer',
+        'recurring_group_id',
+        'cancellation_token'
     ];
     protected $fillable = ['customer_name', 'customer_email', 'reservation_date', 'reservation_start_time', 'reservation_end_time', 'location_id'];
 

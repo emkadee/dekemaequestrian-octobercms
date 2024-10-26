@@ -1,5 +1,5 @@
-url = "/calendar/timeslots/:location_id"
-layout = "calendar"
+url = "/calendar/:location_id"
+layout = "booking"
 title = "Timeslots available"
 
 [BookingCalendar]
@@ -7,3 +7,4 @@ location_id = "{{ :location_id }}"
 ==
 
 {% component "BookingCalendar::timeslots" %}
+
