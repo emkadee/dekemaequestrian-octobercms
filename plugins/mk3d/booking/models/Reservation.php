@@ -25,15 +25,23 @@ class Reservation extends Model
         'reservation_date' => 'required', 'date',
         'reservation_start_time' => 'required', 'time',
         'reservation_end_time' => 'required', 'time',
-        'location_id' => 'required', 'integer',
-        'recurring_group_id',
-        'cancellation_token'
+        'location_id' => 'required', 'integer'
     ];
-    protected $fillable = ['customer_name', 'customer_email', 'reservation_date', 'reservation_start_time', 'reservation_end_time', 'location_id'];
+
+    protected $dates = ['reservation_date'];
+    
+    protected $fillable = ['customer_name', 'customer_email', 'reservation_date', 'reservation_start_time', 'reservation_end_time', 'location_id','recurring_group_id'];
 
     
     public $belongsTo = [
         'location' => \Mk3d\Booking\Models\Location::class
     ];
+
+    public function getRecurringReservations()
+    {
+        return self::where('recurring_group_id', $this->recurring_group_id)->get();
+    }
+
+    
 
 }

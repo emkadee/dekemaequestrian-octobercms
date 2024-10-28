@@ -28,12 +28,6 @@ class Plugin extends PluginBase
         \View::addNamespace('mk3d.booking', base_path() . '/plugins/mk3d/booking/views');
     }
 
-    public function registerMailTemplates()
-    {
-        return [
-            'mk3d.booking::mail.reservation_confirmation' => 'Reservation confirmation email',
-        ];
-    }
 
     /**
      * register method, called when the plugin is first registered.
@@ -43,6 +37,13 @@ class Plugin extends PluginBase
         //
     }
 
+    public function registerMailTemplates()
+    {
+        return [
+            'mk3d.booking::mail.reservation_confirmation' => 'Reservation confirmation email',
+            'mk3d.booking::mail.cancellation_confirmation' => 'Reservation cancellation email',
+        ];
+    }
 
 
     /**
@@ -76,8 +77,6 @@ class Plugin extends PluginBase
      */
     public function registerNavigation()
     {
-
-
         return [
             'booking' => [
                 'label' => 'Booking',
@@ -97,6 +96,12 @@ class Plugin extends PluginBase
                         'label' => 'Locations',
                         'icon' => 'icon-copy',
                         'url' => Backend::url('mk3d/booking/locations'),
+                        'permissions' => ['mk3d.booking.*'],
+                    ],
+                    'calendar' => [
+                        'label' => 'Calendar',
+                        'icon' => 'icon-copy',
+                        'url' => Backend::url('mk3d/booking/reservations/calendar'),
                         'permissions' => ['mk3d.booking.*'],
                     ]
                 ]

@@ -30,3 +30,17 @@ fields:
         searchable: true
         type: recordfinder
         list: $/mk3d/booking/models/location/columns.yaml
+    recurring_group_id:
+        label: Recurring Group ID
+        type: text
+        span: left
+    delete_recurring:
+        label: Delete Recurring
+        type: partial
+        path: $/mk3d/booking/controllers/reservations/_delete_recurring.htm
+        span: full
+    recurring_reservations:
+        label: Recurring Reservations
+        type: partial
+        path: $/mk3d/booking/controllers/reservations/_recurring_reservations.php
+        span: full

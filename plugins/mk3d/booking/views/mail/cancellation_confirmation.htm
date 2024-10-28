@@ -1,0 +1,13 @@
+Hello {{ name }},
+
+We regret to inform you that your reservation has been canceled. Below are the details of the canceled reservation(s):
+
+{% for reservation in reservations %}
+- Date: {{ reservation.reservation_date }}
+- Time: {{ reservation.reservation_start_time }} to {{ reservation.reservation_end_time }}
+{% endfor %}
+
+If you have any questions, please contact us.
+
+Best regards,
+Your Company
