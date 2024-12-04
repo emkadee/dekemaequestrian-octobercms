@@ -308,8 +308,17 @@ h6 {
   color: #33312B; }
 .home .b-text h2 {
   color: #117001; }
+@media only screen and (min-width: 769px) and (max-width: 992px), only screen and (min-width: 993px) and (max-width: 1200px), only screen and (min-width: 1200px) {
+  .home .row-c {
+    margin-top: calc(-1* var(--bs-gutter-y)) !important;
+    margin-right: calc(-.5* var(--bs-gutter-x)) !important;
+    margin-left: calc(-.5* var(--bs-gutter-x)) !important; } }
 .home .c-image {
   padding: 0 !important; }
+  @media only screen and (max-width: 576px), only screen and (min-width: 577px) and (max-width: 768px) {
+    .home .c-image img {
+      width: calc(100vw + (-.75* var(--bs-gutter-x))) !important;
+      margin-left: calc(-.5* var(--bs-gutter-x)) !important; } }
   .home .c-image p {
     margin: 0 !important; }
 .home .c-text h1 {

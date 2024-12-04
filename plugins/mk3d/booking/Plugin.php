@@ -83,8 +83,7 @@ class Plugin extends PluginBase
      * registerPermissions used by the backend.
      */
     public function registerPermissions()
-    {
-        return []; // Remove this line to activate
+    {  
 
         return [
             'mk3d.booking.some_permission' => [

@@ -1,0 +1,18 @@
+fields:
+    title:
+        label: Naam
+        span: auto
+        type: text
+    image:
+        label: 'Media Finder'
+        mode: file
+        thumbOptions:
+            mode: crop
+            extension: auto
+        span: auto
+        type: mediafinder
+    description:
+        label: Review
+        size: ''
+        span: full
+        type: textarea

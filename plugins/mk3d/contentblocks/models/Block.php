@@ -20,10 +20,30 @@ class Block extends Model
      */
     public $table = 'mk3d_contentblocks_items';
 
+    protected $fillable = [
+        'title', 
+        'description', 
+        'image', 
+        'type'
+    ];
+
+    protected $appends = ['type_label'];
+
     /**
      * @var array rules for validation.
      */
     public $rules = [
     ];
+
+    // Define the getTypeLabelAttribute method as an accessor
+    public function getTypeLabelAttribute()
+    {
+        $types = [
+            'content' => 'Content',
+            'review' => 'Review'
+        ];
+
+        return $types[$this->type] ?? 'Content';
+    }
 
 }

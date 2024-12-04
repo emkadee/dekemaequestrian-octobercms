@@ -13,6 +13,7 @@ class BuilderTableCreateMk3dContentblocksItems extends Migration
             $table->string('title', 255);
             $table->text('description');
             $table->string('image', 255);
+            $table->string('type', 255)->default('content');
         });
     }
     

@@ -1,0 +1,10 @@
+columns:
+    title:
+        label: Naam
+        type: text
+    description:
+        label: Review
+        type: text
+    image:
+        label: image
+        type: text

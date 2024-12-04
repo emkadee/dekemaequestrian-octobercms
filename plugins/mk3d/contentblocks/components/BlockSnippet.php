@@ -11,7 +11,7 @@ class BlockSnippet extends ComponentBase
     public function componentDetails()
     {
         return [
-            'name' => 'MK3D - Contentblock',
+            'name' => 'MK3D - Content Snippet',
             'description' => 'Displays a block of content in different styles',
         ];
     }
@@ -64,7 +64,7 @@ class BlockSnippet extends ComponentBase
 
     public function getBlockOptions()
     {
-        $options = ContentBlockModel::all()->pluck('title', 'id')->toArray();
+        $options = ContentBlockModel::where('type', 'content')->pluck('title', 'id')->toArray();
         #Log::info('Service Item Options: ', $options);
         return $options;
     }

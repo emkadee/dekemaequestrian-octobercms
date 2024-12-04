@@ -1,0 +1,16 @@
+{% if contentBlock is not empty %}
+        <div class="review d-flex p-3 pb-1 justify-content-between">
+            <div>                
+                 <div class="image"><img src="{{ contentBlock.image | media}}" class="block-img" alt="{{ contentBlock.title }}-review"></div>
+                 <div class="text">
+                    <p>"{{ contentBlock.description }}"</p>
+                    <h6>{{ contentBlock.title }}</h6>            
+                </div>
+            </div>
+        </div>
+
+{% else %}
+    <p>No contentblock items found.</p>
+{% endif %}
+
+
