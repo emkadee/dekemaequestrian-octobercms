@@ -1,8 +1,6 @@
 <h1>Cancel Reservation - From component </h1>
 <h6>{{ cancellation_token }}</h6>
 
-
-
 <form data-request="onConfirmCancelReservation">
     <input type="hidden" name="cancellation_token" value="{{ cancellation_token }}">
     {% if isRecurring %}
@@ -10,13 +8,17 @@
         <h3>Recurring Reservations:</h3>
         <ul>
             {% for reservation in recurringReservations %}
-                <li>{{ reservation.reservation_date|date('d M Y') }} - {{ reservation.reservation_start_time|date("H:i") }} uur tot {{ reservation.reservation_end_time|date("H:i")  }} uur</li>
+                {% if reservation.reservation_start_date == reservation.reservation_end_date %}
+                    <li>{{ reservation.reservation_start_date|date('l j F Y', 'Europe/Amsterdam') }} - {{ reservation.reservation_start_time|date("H:i") }} tot {{ reservation.reservation_end_time|date("H:i")  }} uur</li>
+                {% else %}
+                    <li>{{ reservation.reservation_start_date|date('l j F Y', 'Europe/Amsterdam') }} - {{ reservation.reservation_start_time|date("H:i") }} tot {{ reservation.reservation_end_date|date('l j F Y', 'Europe/Amsterdam') }} - {{ reservation.reservation_end_time|date("H:i")  }} uur</li>
+                {% endif %}
+               
             {% endfor %}
         </ul>
         <input type="checkbox" name="cancel_all" value="1"> Yes, cancel all
     {% else %}
-        <p>Are you sure you want to cancel your reservation?</p>
-        <li>{{ reservation.reservation_date|date('d M Y') }} - {{ reservation.reservation_start_time|date("H:i") }} uur tot {{ reservation.reservation_end_time|date("H:i")  }} uur</li>
+        <p>No reservationd found</p>
     {% endif %}
     
     <button type="submit" class="btn btn-danger">Yes, Cancel Reservation</button>

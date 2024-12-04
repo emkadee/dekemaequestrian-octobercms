@@ -2,6 +2,13 @@
 
 use Backend;
 use System\Classes\PluginBase;
+use View;
+use Twig\Environment;
+use Twig\TwigFilter;
+use IntlDateFormatter;
+use Event;
+use Log;
+
 
 /**
  * Plugin Information File
@@ -25,8 +32,13 @@ class Plugin extends PluginBase
     public function boot()
     {
         // Register the view namespace
-        \View::addNamespace('mk3d.booking', base_path() . '/plugins/mk3d/booking/views');
+/*         View::addNamespace('mk3d.booking', base_path() . '/plugins/mk3d/booking/views'); */
+        View::share('site_name', 'Dekema Equestrian');
+
+
+        
     }
+
 
 
     /**
@@ -37,13 +49,23 @@ class Plugin extends PluginBase
         //
     }
 
+
+ /* 
     public function registerMailTemplates()
     {
         return [
-            'mk3d.booking::mail.reservation_confirmation' => 'Reservation confirmation email',
-            'mk3d.booking::mail.cancellation_confirmation' => 'Reservation cancellation email',
+            'mk3d.booking::mail.reservation_confirmation' => 'reservation_confirmation',
+            'mk3d.booking::mail.cancellation_confirmation' => 'cancellation_confirmation',
+            'mk3d.booking::mail.reservation_update' => 'reservation_update',
         ];
     }
+   
+    public function registerMailLayouts()
+    {
+        return [
+            'mk3d.booking::mail.booking_layout' => 'Booking Layout',
+        ];
+    } */
 
 
     /**

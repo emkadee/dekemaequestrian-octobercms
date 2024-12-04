@@ -1,0 +1,13 @@
+scopes:
+  future_reservations:
+    label: Only upcoming reservations
+    type: checkbox
+    modelScope: "Mk3d\\Booking\\Controllers\\Reservations::applyFutureReservationsFilter"
+    default: true
+
+  location:
+    label: Location
+    type: dropdown
+    optionsMethod: "Mk3d\\Booking\\Controllers\\Reservations::getLocationOptions"
+    modelScope: "Mk3d\\Booking\\Controllers\\Reservations::applyLocationFilter"
+    default: 0

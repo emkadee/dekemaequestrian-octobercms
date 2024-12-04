@@ -1,22 +1,39 @@
 /* NAVBAR */
 .navbar {
-    font-family: "Ysabeau", sans-serif;
+    font-family: "Domine";
     font-optical-sizing: auto;
     font-weight: 600;
+    font-size: 0.9em;
+
     font-style: normal;
 }
 
 a.navbar-brand {
-    font-family: "Ysabeau SC";
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
-    font-size: 1.9em;
+
+    margin: auto !important;
+    padding-left: 20px;
+
 }
 
+.navbar a {
+    color: lighten($terColor, 40%) !important;
+}
+
+/* .navbar-expand-md {
+    padding-top: 0;
+} */
+
 a.navbar-brand img {
+    display: none;
+    margin: auto;
     margin-top: -4px;
-    height: 38px;
+    height: 50px;
+
+
+    @include for_breakpoint(xs sm) {
+        display: block !important;
+        margin: auto;
+    }
 }
 
 .navbar-toggler {
@@ -31,9 +48,9 @@ a.navbar-brand img {
 }
 
 .custom-toggler {
-    margin-top: 7px;
+    margin-top: 2px;
 }
 
 .custom-toggler .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(243, 199, 39)' stroke-linecap='round' stroke-miterlimit='12' stroke-width='3' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(224, 218, 199)' stroke-linecap='round' stroke-miterlimit='12' stroke-width='3' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }

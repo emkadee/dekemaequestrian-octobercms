@@ -30,7 +30,7 @@ link_text = "Lees meer"
         
             <div class="container-lg">
                 <div class="row">
-                    <div class="col-md-8">
+                    <div class="col-md-12">
                         <h1 class="page-title">
                             {% if this.page.meta_title %}
                                 {{ this.page.meta_title }}
@@ -38,13 +38,6 @@ link_text = "Lees meer"
                                 {{ this.page.title }}
                             {% endif %}
                         </h1>
-                    </div>
-                    <div class="col-md-4">
-                        {% if user %}
-                            <p>Hello {{ user.first_name }}</p>
-                        {% else %}
-                            <p>Nobody is logged in</p>
-                        {% endif %}
                     </div>
                 </div>
             </div>

@@ -8,10 +8,12 @@ class SeedLocationTable extends Seeder
     public function run()
     {
         $location = Location::create([
-            'name' => 'Rijhal',
+            'name' => 'Grote rijhal',
             'opening_time' => '07:00',
             'closing_time' => '00:00',
             'timeslot_duration' => '60',
+            'color' => '#F0C523',
+            'public_available' => true
         ]);
     }
 }

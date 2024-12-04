@@ -43,6 +43,76 @@ div:has(> .d-flex) {
 }
 
 .simple,
+.review {
+    padding: 4em;
+    margin-right: 2em !important;
+    text-align: left;
+    flex: 1;
+    border: 2px solid $priColor;
+    border-radius: 1.2em;
+    background-color: lighten($priColor, 32%);
+
+    @include for_breakpoint(xs sm) {
+        margin-top: 1em;
+        margin-right: 0;
+    }
+
+    p {
+        font-size: calc(0.8rem + 0.2vw);
+    }
+
+    a,
+    h3 {
+        color: $quiColor !important;
+        text-decoration: none;
+        font-size: 1.2em;
+    }
+
+
+}
+
+.review {
+    padding-bottom: 2em;
+
+
+    .image {
+        float: left;
+
+        @include for_breakpoint(xs sm) {
+            clear: both;
+            margin: auto;
+        }
+
+        img {
+            height: 100px;
+            width: 100px;
+            border-radius: 50px;
+
+        }
+    }
+
+    .text {
+        float: left;
+        width: calc(100% - 116px);
+        margin-left: 16px;
+
+        @include for_breakpoint(xs sm) {
+            clear: both;
+            width: 100%;
+        }
+
+        p {}
+    }
+
+
+}
+
+.simple:last-child {
+    margin-right: 0;
+
+
+}
+
 .textimage {
     margin: 1em;
     text-align: center;
@@ -85,48 +155,62 @@ div:has(> .d-flex) {
         flex: auto;
     }
 }
+
 .timeslots {
     ul {
         padding: 0;
         font-size: 0.8em;
     }
+
     li {
-        list-style-type: none;   
-        border: 1px dotted $priColor; 
-        border-top: 0; 
+        list-style-type: none;
+        border: 1px dotted $priColor;
+        border-top: 0;
         padding: 0;
-        margin: 0;   
+        margin: 0;
     }
+
     li:first-child {
-        border-top: 1px dotted $priColor; 
+        border-top: 1px dotted $priColor;
     }
+
     li.reserved {
         background-color: $priColor;
         color: $quiColor;
-        padding: 0.4em; 
+        padding: 0.4em;
         padding-left: 1em;
-        display: block; width: 100%; height: 100%; 
+        display: block;
+        width: 100%;
+        height: 100%;
         border-color: $quiColor;
     }
+
     li.available {
-        
+
         color: $quiColor;
+
         .passed {
-            padding: 0.4em; 
-            padding-left: 1em;  
-        }
-        a {
-            padding: 0.4em; 
+            padding: 0.4em;
             padding-left: 1em;
-            display: block; width: 100%; height: 100%; 
+        }
+
+        a {
+            padding: 0.4em;
+            padding-left: 1em;
+            display: block;
+            width: 100%;
+            height: 100%;
             color: $priColor;
             text-decoration: none;
             background-color: $quaColor;
         }
+
         a:hover {
-            padding: 0.4em; 
+            padding: 0.4em;
             padding-left: 1em;
-            display: block; width: 100%; height: 100%; 
+            display: block;
+            width: 100%;
+            height: 100%;
             color: $priColor;
             text-decoration: none;
             background-color: $quiColor;

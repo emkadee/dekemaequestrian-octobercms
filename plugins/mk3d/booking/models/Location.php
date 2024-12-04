@@ -23,10 +23,12 @@ class Location extends Model
         'name' => 'required', 'string',
         'opening_time' => 'required', 'time',
         'closing_time' => 'required', 'time',
-        'timeslot_duration' => 'required', 'time' 
+        'timeslot_duration' => 'required', 'time',
+        'color' => 'required', 'color',
+        'public_available' => 'required', 'boolean' 
     ];
 
-    protected $fillable = ['name', 'opening_time', 'closing_time', 'timeslot_duration'];
+    protected $fillable = ['name', 'opening_time', 'closing_time', 'timeslot_duration', 'color', 'public_available'];
 
     public $hasMany = [
         'reservation' => \Mk3d\Booking\Models\Reservation::class

@@ -3,29 +3,39 @@
 # ===================================
 
 columns:
-    id:
-        label: ID
-        searchable: true
     customer_name:
-        label: Customer Name
+        label: Name
         searchable: true
     customer_email:
-        label: Customer Email
+        label: Email
         searchable: true
-    reservation_date:
-        label: Reservation Date
-        searchable: true
+    reservation_start_date:
+        label: Start date
+        type: date
+        mode: date
+        format: j F Y
+    reservation_end_date:
+        label: End date
+        type: date
+        mode: date
+        format: j F Y
     reservation_start_time:
-        label: Reservation Start time
+        label: Start time
         searchable: true
+        type: time
+        format: "H:i"
     reservation_end_time:
-        label: Reservation End time
+        label: End time
         searchable: true
+        type: time
+        format: "H:i"
     location:
         label: Location
         relation: location
         select: name
-    recurring_group_id:
-        label: Recurring ID
-        sortable: true
+    status:
+        label: Status
+        type: text
         searchable: true
+        sortable: true
+        valueFrom: status

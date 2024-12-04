@@ -31,6 +31,11 @@ class BlockSnippet extends ComponentBase
                 'type'        => 'dropdown',
                 'options'     => $this->getStaticPageOptions()
             ],
+            'url' => [
+                'title'       => 'Page URL',
+                'description' => 'Type a url to link to',
+                'type'        => 'string'
+            ],
             'link_text' => [
                 'title'       => 'Link text',
                 'description' => 'Text for the link',
@@ -44,11 +49,18 @@ class BlockSnippet extends ComponentBase
                 'options' => [
                             'simple'    => 'Simple',
                             'textimage' => 'Text and image',
-                            'card'      => 'Card'
+                            'card'      => 'Card',
+                            'button'    => 'Button',
+                            'review'    => 'Review',
                             ],
             ]
         ];
     }
+
+    public function onRender()
+    {
+        ($this->property('template_alias')) ?  $this->alias = $this->property('template_alias') : '';
+   }
 
     public function getBlockOptions()
     {
@@ -80,6 +92,7 @@ class BlockSnippet extends ComponentBase
 
         $this->page['contentBlock'] = $this->loadBlocks($postId);
         $this->page['staticPageUrl'] = $this->property('static_page_url');
+        $this->page['url'] = $this->property('url');
         $this->page['linkText'] = $this->property('link_text');
         $this->page['blockStyle'] = $this->property('block_style');
     }
@@ -92,14 +105,18 @@ class BlockSnippet extends ComponentBase
 
         $block = ContentBlockModel::find($id);
 
+        Log::info ('Block Item ID: ' . $id);
+        Log::info('Block Item Data: ' . json_encode($block->toArray()));
+
         if (!$block) {
             Log::error("Block with ID $id not found.");
             return null;
         }
-        #Log::info('Block Item Data: ' . json_encode($block->toArray()));
-
+        Log::info('Block Item Data: ' . json_encode($block->toArray()));
 
         return $block->toArray();
+
+        
     }
 
 

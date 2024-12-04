@@ -18,6 +18,39 @@
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'timeGridWeek',
+
+                customButtons: {
+                    customDayView: {
+                        text: 'Day',
+                        click: function() {
+                            calendar.changeView('timeGridDay');
+                        }
+                    },
+                    customWeekView: {
+                        text: 'Week',
+                        click: function() {
+                            calendar.changeView('timeGridWeek');
+                        }
+                    },
+                    customListView: {
+                        text: 'List Week',
+                        click: function() {
+                            calendar.changeView('listWeek');
+                        }
+                    },
+                    customMonthView: {
+                        text: 'Month',
+                        click: function() {
+                            calendar.changeView('dayGridMonth');
+                        }
+                    }
+                },
+
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'customDayView,customWeekView,customListView,customMonthView'
+                },
                 
                 
                 events: {
@@ -39,6 +72,11 @@
                         window.location.href = info.event.url;
                         info.jsEvent.preventDefault(); // don't let the browser navigate
                     }
+                },
+                eventTimeFormat: { // like '14:30'
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
                 }
             });
 

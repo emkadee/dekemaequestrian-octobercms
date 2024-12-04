@@ -1,0 +1,33 @@
+<!-- plugins/mk3d/booking/partials/_update_end_date.htm -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var startDateField = document.querySelector('[data-field-name="reservation_start_date"] input');
+        var endDateField = document.querySelector('[data-field-name="reservation_end_date"] input');
+
+        startDateField.addEventListener('change', function() {
+            if (startDateField.value) {
+                endDateField.value = startDateField.value;
+                
+            }
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var recurringCheckbox = document.querySelector('[data-field-name="recurring"] input[type="checkbox"]');
+        var frequencyField = document.querySelector('[data-field-name="frequency"]');
+        var endDateField = document.querySelector('[data-field-name="recurring_end_date"]');
+
+        function toggleRecurringFields() {
+            if (recurringCheckbox.checked) {
+                frequencyField.style.display = 'block';
+                endDateField.style.display = 'block';
+            } else {
+                frequencyField.style.display = 'none';
+                endDateField.style.display = 'none';
+            }
+        }
+
+        recurringCheckbox.addEventListener('change', toggleRecurringFields);
+        toggleRecurringFields(); // Initial call to set the correct state
+    });
+</script>

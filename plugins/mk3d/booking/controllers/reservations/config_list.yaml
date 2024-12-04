@@ -5,6 +5,8 @@
 # Model List Column configuration
 list: $/mk3d/booking/models/reservation/columns.yaml
 
+filter: config_filter.yaml
+
 # Model Class name
 modelClass: Mk3d\Booking\Models\Reservation
 
@@ -31,7 +33,7 @@ showSorting: true
 
 # Default sorting column
 defaultSort:
-    column: id
+    column: reservation_start_date
     direction: asc
 
 # Display checkboxes next to each record

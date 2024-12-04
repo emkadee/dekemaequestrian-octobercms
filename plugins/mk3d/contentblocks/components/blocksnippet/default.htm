@@ -2,13 +2,29 @@
 {% if contentBlock is not empty %}
 
     {% if blockStyle == 'simple' %}
-        <div class="simple d-flex p-2">
-            <a href="{{ staticPageUrl }}">
+        <div class="simple d-flex p-3 pb-1 justify-content-between">
+            {% if url is not empty %}
+                <a href="{{ url }}">
+            {% else %}
+                <a href="{{ staticPageUrl }}">
+            {% endif %}            
             <div>                
-                <img src="{{ contentBlock.image | media}}" class="block-img" alt="{{ contentBlock.title }}">
-                <p>{{ contentBlock.description|slice(0, 50)}}...  {{ linkText }}</p>            
+                <h3>{{ contentBlock.title }}</h3>
+                <p>{{ contentBlock.description }}  <br />{{ linkText }}</p>            
             </div>
             </a>
+        </div>
+    {% endif %}
+
+    {% if blockStyle == 'review' %}
+        <div class="review d-flex p-3 pb-1 justify-content-between">
+            <div>                
+                 <div class="image"><img src="{{ contentBlock.image | media}}" class="block-img" alt="{{ contentBlock.title }}-review"></div>
+                 <div class="text">
+                    <p>"{{ contentBlock.description }}"</p>
+                    <h6>{{ contentBlock.title }}</h6>            
+                </div>
+            </div>
         </div>
     {% endif %}
 
@@ -22,7 +38,7 @@
     {% endif %}
 
     {% if blockStyle == 'card' %}
-        <div class="card d-flex  p-2">
+        <div class="card d-flex p-2">
             <div class="card-body">
                 <h5 class="card-title">{{ contentBlock.title }}</h5>
                 <img src="{{ contentBlock.image | media}}" class="card-img-top" alt="{{ contentBlock.title }}">
@@ -32,6 +48,11 @@
             <div class="card-footer">
                 <a href="{{ staticPageUrl }}" class="btn btn-pri">{{ linkText }}</a>
             </div>
+        </div>
+    {% endif %}
+     {% if blockStyle == 'button' %}
+        <div>
+            <a href="{{ staticPageUrl }}" class="btn btn-qui">{{ linkText }}</a>
         </div>
     {% endif %}
 

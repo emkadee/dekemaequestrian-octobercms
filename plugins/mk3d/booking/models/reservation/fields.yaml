@@ -1,46 +1,78 @@
-# ===================================
-#  Form Field Definitions
-# ===================================
-
 fields:
-    id:
-        label: ID
-        disabled: true
     customer_name:
         label: Customer Name
-        searchable: true
-    customer_email:
-        label: Customer Email
-        searchable: true
-    reservation_date:
-        label: Reservation Date
-        searchable: true
+        type: text
+        span: left
+
+    reservation_start_date:
+        label: Reservation Start date
         type: datepicker
         mode: date
+        span: right
+        size: small
+
+    customer_email:
+        label: Customer Email
+        type: text
+        span: left
+        default: mkdijkstra@gmail.com
+
+    reservation_end_date:
+        label: Reservation End date
+        type: datepicker
+        mode: date
+        span: right
+        size: small
+
+    location:
+        label: Location
+        type: recordfinder
+        list: $/mk3d/booking/models/location/columns.yaml
+        span: left
     reservation_start_time:
         label: Reservation Start Time
         type: datepicker
         mode: time
+        span: right
+    status:
+        label: Status
+        type: dropdown
+        options:
+            pending: Pending
+            confirmed: Confirmed
+            cancelled: Cancelled
+        span: left
+
     reservation_end_time:
         label: Reservation End Time
         type: datepicker
         mode: time
-    location:
-        label: Location
-        searchable: true
-        type: recordfinder
-        list: $/mk3d/booking/models/location/columns.yaml
-    recurring_group_id:
-        label: Recurring Group ID
-        type: text
+        span: right
+
+    recurring:
+        label: Recurring Reservation
+        type: checkbox
+        span: right
+
+    frequency:
+        label: Frequency
+        type: dropdown
+        options:
+            1: Every week
+            2: Every two weeks
+            4: Every four weeks
+        dependsOn: recurring
+        span: right
+
+    recurring_end_date:
+        label: End Date
+        type: datepicker
+        mode: date
+        dependsOn: recurring
+        span: right
+
+    update_customer:
+        label: Send an email to the customer
+        type: checkbox
         span: left
-    delete_recurring:
-        label: Delete Recurring
-        type: partial
-        path: $/mk3d/booking/controllers/reservations/_delete_recurring.htm
-        span: full
-    recurring_reservations:
-        label: Recurring Reservations
-        type: partial
-        path: $/mk3d/booking/controllers/reservations/_recurring_reservations.php
-        span: full
+        default: 1

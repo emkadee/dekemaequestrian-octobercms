@@ -1,0 +1,20 @@
+layout = "mk3d.booking::mail.booking_layout"
+subject = "Reservation Update"
+==
+<p>Beste e{{ name }},</p>
+<p>Jouw reservering voor de {{ location }} is aangepast. Hieronder vind je de details:</p>
+<ul>
+    {% for reservation in reservation_dates %}
+        <li><strong>Datum:</strong> {{ reservation.date|date("l d F Y") }} <strong>Tijd:</strong> {{ reservation.time }} tot {{ reservation.end_time }}</li>
+        <strong>Cancellation Link:</strong> <a href="{{ reservation.cancellation_link }}">Cancel Reservation</a>
+        <ul>
+            {% for message in reservation.messages %}
+                <li>{{ message }}</li>
+            {% else %}
+                <li>No messages found</li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+    
+</ul>
+<p>If you have any questions or need to make changes to your reservation, please contact us.</p>

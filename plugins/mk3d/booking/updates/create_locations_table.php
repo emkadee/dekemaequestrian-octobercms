@@ -23,6 +23,8 @@ return new class extends Migration
             $table->time('opening_time');
             $table->time('closing_time');
             $table->integer('timeslot_duration');
+            $table->string('color');
+            $table->boolean('public_available')->default(false);
         });
     }
 

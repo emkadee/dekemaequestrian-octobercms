@@ -22,6 +22,10 @@
             }
         }
     }
+
+    .bg_#{$colorName}_light {
+        background-color: lighten($color, 25%);
+    }
 }
 
 
@@ -62,6 +66,32 @@
     }
 
 }
+
+
+/* Media Queries */
+$media_queries : ('xs' : unquote("only screen and (max-width: 576px)"),
+    'sm' : unquote("only screen and (min-width: 577px) and (max-width: 768px)"),
+    'md' : unquote("only screen and (min-width: 769px) and (max-width: 992px)"),
+    'lg' : unquote("only screen and (min-width: 993px) and (max-width: 1200px)"),
+    'xl' : unquote("only screen and (min-width: 1200px)"));
+
+@mixin for_breakpoint($breakpoints) {
+    $conditions : ();
+
+    @each $breakpoint in $breakpoints {
+        // If the key exists in the map
+        $conditions: append($conditions,
+                #{inspect(map-get($media_queries, $breakpoint))},
+                comma);
+    }
+
+    @media #{$conditions} {
+        @content;
+    }
+}
+
+
+
 
 
 

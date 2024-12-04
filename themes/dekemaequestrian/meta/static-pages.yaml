@@ -2,5 +2,5 @@ static-pages:
     index: {  }
     accommodatie: {  }
     vakantie: {  }
-    diensten: {  }
     over-ons: {  }
+    diensten: {  }

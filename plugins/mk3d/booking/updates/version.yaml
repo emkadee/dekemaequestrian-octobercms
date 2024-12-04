@@ -2,8 +2,5 @@ v1.0.1: First version of Booking
 v1.0.2:
   - create tables
   - create_locations_table.php
-  - seed_locations.php
   - create_reservations_table.php
-v1.0.3:
-  - create tables
-  - add_recurring_id_and_cancelation_id_to_reservations.php
+  - seed_locations.php

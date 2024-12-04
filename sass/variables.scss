@@ -3,6 +3,10 @@ $secColor: #EAA044;
 $terColor: #8C7F4F;
 $quaColor: #595544;
 $quiColor: #33312B;
+$lgColor: #117001;
+$dgColor: #0A4A00;
+$ligColor: #e0dac7;
+
 
 
 $colors: (
@@ -11,6 +15,11 @@ $colors: (
     ter: $terColor,
     qua: $quaColor,
     qui: $quiColor,
+    header: $lgColor,
     whi: #fff,
     bla: #000
 );
+
+$phone-width: 540px;
+$tablet-width: 768px;
+$desktop-width: 1024px;

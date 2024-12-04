@@ -23,3 +23,9 @@ fields:
         label: Minimal Timeslot Duration in minutes
         searchable: true
         type: number
+    public_available:
+        label: Public Available
+        type: checkbox
+    color:
+        label: Calendar color
+        type: colorpicker

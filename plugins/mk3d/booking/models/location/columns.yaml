@@ -18,3 +18,8 @@ columns:
     timeslot_duration:
         label: Timeslot Duration
         searchable: true
+    color:
+        label: Calendar color
+    public_available:
+        label: Public Available
+        searchable: true

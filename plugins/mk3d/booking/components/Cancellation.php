@@ -54,6 +54,8 @@ class Cancellation extends ComponentBase
         $this->page['recurringGroupId'] = $reservation->recurring_group_id;
         $this->page['recurringReservations'] = $recurringReservations; 
         $this->page['reservation'] = $reservation; 
+
+        Log::info('Recurring Reservations: ' . $recurringReservations);
        
     }
 

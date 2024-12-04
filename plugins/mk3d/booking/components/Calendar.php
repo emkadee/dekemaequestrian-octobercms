@@ -55,6 +55,7 @@ class Calendar extends ComponentBase
         if ($location) {
             Log::info('Location : ' . $location->name);
             $this->page['location_name'] = $location->name;
+            $this->page->title = $location->name . ' | Direct reserveren'; 
         }
         
     }
@@ -70,7 +71,7 @@ class Calendar extends ComponentBase
         // Query reservations for the specific location
         $reservations = Reservation::with('location')
             ->where('location_id', $locationId)
-            ->whereDate('reservation_date', $date)
+            ->whereDate('reservation_start_date', $date)
             ->get();
 
         Log::info('Reservations: ' . $reservations->toJson());
@@ -139,7 +140,7 @@ class Calendar extends ComponentBase
 
     public function onSubmitReservation() {      
         
-        $data = post();
+        $formData = post();
 
         $rules = [
             'name'     => 'required',
@@ -150,23 +151,18 @@ class Calendar extends ComponentBase
             'date'     => 'required|date'
         ];
 
-        if (isset($data['recurring']) && $data['recurring'] == 'true') {
+        if (isset($formData['recurring']) && $formData['recurring'] == 'true') {
             $rules['recurring_interval'] = 'required|integer|min:1';
             $rules['recurring_end_date'] = 'required|date|after:date';
         }
 
-
-        $validation = Validator::make($data, $rules);
+        $validation = Validator::make($formData, $rules);
 
         if ($validation->fails()) {
             throw new ValidationException($validation);
         }
 
-        // Generate a unique recurring group ID if not provided
-        $recurringGroupId = $data['recurring_group_id'] ?? uniqid('recurring_', true);
-
         
-
 
         $customer_name = Input::get('name');
         $customer_email = Input::get('email');
@@ -188,26 +184,18 @@ class Calendar extends ComponentBase
             $weeksDiff = $startDate->diff($endDate)->days / 7;
             $recurringCount = (int)floor($weeksDiff / $interval) + 1;
         }
-    
-        Log::info('Customer Name: ' . $customer_name);
-        Log::info('Customer Email: ' . $customer_email);
-        Log::info('Location ID: ' . $location_id);
-        Log::info('Time: ' . $time);
-        Log::info('Duration: ' . $duration);
-        Log::info('Date: ' . $date); // Log the date
-        Log::info('Startdate: ' . $startDate->format('Y-m-d H:i:s'));
-        Log::info('Enddate: ' . ($endDate ? $endDate->format('Y-m-d H:i:s') : 'N/A'));
-        Log::info('Interval: ' . $interval);
-        Log::info('recurringCount: ' . $recurringCount);
 
     
         $startTime = strtotime($time);
         $endTime = strtotime('+' . ($duration * 60) . ' minutes', $startTime);
-        $endTime = strtotime('-1 minute', $endTime);
 
-        // Store all reservation dates for the email
+        // Create an empty array to store all reservation dates for the email
         $reservationDates = [];
 
+       
+
+        // Generate a unique recurring group ID if not provided
+        $recurringGroupId = $formData['recurring_group_id'] ?? uniqid('recurring_', true);
 
         // Create reservations
         for ($i = 0; $i < $recurringCount; $i++) {
@@ -215,17 +203,20 @@ class Calendar extends ComponentBase
             $reservationDate->modify("+" . ($i * $interval) . " weeks");
 
             $startTime = strtotime($reservationDate->format('Y-m-d') . ' ' . $time);
-            $endTime = $startTime + ($data['duration'] * 3600);               
+            $endTime = $startTime + ($formData['duration'] * 3600);      
             
             // Check for overlapping reservations
-            $overlappingReservations = Reservation::where('location_id', $data['location_id'])
-                ->whereDate('reservation_date', $reservationDate) // Ensure the date is considered
+            $overlappingReservations = Reservation::where('location_id', $formData['location_id'])
+                ->whereDate('reservation_start_date', $reservationDate) // Ensure the date is considered
                 ->where(function($query) use ($startTime, $endTime) {
-                    $query->whereBetween('reservation_start_time', [date('Y-m-d H:i', $startTime), date('Y-m-d H:i', $endTime)])
-                        ->orWhereBetween('reservation_end_time', [date('Y-m-d H:i', $startTime), date('Y-m-d H:i', $endTime)])
+                    $startTimePlusOneMinute = strtotime('+1 minute', $startTime);
+                    $endTimeMinusOneMinute = strtotime('-1 minute', $endTime);
+
+                    $query->whereBetween('reservation_start_time', [date('Y-m-d H:i', $startTime), date('Y-m-d H:i', $endTimeMinusOneMinute)])
+                        ->orWhereBetween('reservation_end_time', [date('Y-m-d H:i', $startTimePlusOneMinute), date('Y-m-d H:i', $endTime)])
                         ->orWhere(function($query) use ($startTime, $endTime) {
                             $query->where('reservation_start_time', '<', date('Y-m-d H:i', $startTime))
-                                    ->where('reservation_end_time', '>', date('Y-m-d H:i', $endTime));
+                                ->where('reservation_end_time', '>', date('Y-m-d H:i', $endTime));
                         });
                 })
                 ->exists();
@@ -235,47 +226,81 @@ class Calendar extends ComponentBase
                 return;
             }
 
-            // Generate a unique cancellation token
-            $cancellationToken = uniqid('cancel_', true);    
 
             $reservation = new Reservation();
-            $reservation->customer_name = $data['name'];
-            $reservation->customer_email = $data['email'];
-            $reservation->location_id = $data['location_id'];
-            $reservation->location = Location::find($data['location_id']);
-            $reservation->reservation_date = $reservationDate->format('Y-m-d');
+            $reservation->customer_name = $formData['name'];
+            $reservation->customer_email = $formData['email'];
+            $reservation->location_id = $formData['location_id'];
+            $reservation->location = Location::find($formData['location_id']);
+            $reservation->reservation_start_date = $reservationDate->format('Y-m-d');
+            $reservation->reservation_end_date = $reservationDate->format('Y-m-d');
             $reservation->reservation_start_time = date('H:i', $startTime);
             $reservation->reservation_end_time = date('H:i', $endTime);
             $reservation->recurring_group_id = $recurringGroupId; // Set the recurring group ID
-            $reservation->cancellation_token = $cancellationToken; // Set the cancellation token
-
+            $reservation->cancellation_token = uniqid('cancel_', true);   // Set the cancellation token
+            $reservation->status = 'Pending';
             $reservation->save();
 
+             //Set the messages for each reservation for the update email
+            $messages = [];
+            array_push($messages, 'Je krijgt nog een bevestiging van deze reservering als deze akkoord is.');
             
+            $statusMessage = 'In aanvraag';
+ 
+            
+            Log::info('messages: ' . print_r($messages, true));
+            
+            
+            $location = Location::find($formData['location_id']);
+            $locationName = $location->name;  
             // Add the reservation date to the list for the email
-            $reservationDates[] = [
+            $reservationDetails[] = [
                 'date' => $reservationDate->format('Y-m-d'),
                 'time' => date('H:i', $startTime),
                 'end_time' => date('H:i', $endTime),
-                'cancellation_link' => url('/cancellation/' . $cancellationToken), // Include the cancellation token
+                'location' => $locationName,
+                'messages' => $messages,
+                'status_message' => $statusMessage,
+                'cancellation_link' => url('/cancellation/' . $reservation->cancellation_token), // Include the cancellation token
             ];
         }
-
-        // Send the reservation confirmation email with the cancellation link
-        $this->sendReservationConfirmationEmail($data['email'], $data['name'], $reservationDates);
+        
+        
+        // Send the reservation confirmation email with the cancellation link and the location name
+        $mailSubject = 'Update van jouw reservering';        
+        $this->sendReservationConfirmationEmail($formData['email'], $formData['name'], $mailSubject, $reservationDetails);
         
         \Flash::success('Reservation successfully made!');
-        return \Redirect::to('/calendar/' . $data['location_id'] . '?date=' . $data['date']);
+        return \Redirect::to('/calendar/' . $formData['location_id'] . '?date=' . $formData['date']);
     }
 
-    //SEND RESERVATION CONFIRMATION EMAIL
-    protected function sendReservationConfirmationEmail($email, $name, $reservationDates)
+/*     //SEND RESERVATION CONFIRMATION EMAIL
+    protected function sendReservationConfirmationEmail($email, $name, $locationName, $$reservationDetails)
     {
         // Send the email (assuming you have a mail template set up)
-        Mail::send('mk3d.booking::mail.reservation_confirmation', ['name' => $name, 'reservation_dates' => $reservationDates], function($message) use ($email, $name) {
+        Mail::send('mk3d.booking::mail.reservation_confirmation', ['name' => $name, 'location' => $locationName, 'reservation_details' => $$reservationDetails], function($message) use ($email, $name) {
             $message->to($email, $name);
             $message->subject('Reservation Confirmation');
         });
+
+    } */
+
+    protected function sendReservationConfirmationEmail($email, $name, $mailSubject, $reservationDetails)
+    {
+        // Debugging: Log the data to ensure it's correct
+        Log::info('Reservation details: ' . json_encode($reservationDetails));
+
+        // Send the email (assuming you have a mail template set up)
+        Mail::send('mk3d.booking::mail.reservation_confirmation', [
+            'name' => $name, 
+            'reservation_details' => $reservationDetails
+        ], 
+        
+        function($message) use ($email, $name, $mailSubject) {
+            $message->to($email, $name);
+            $message->subject($mailSubject);
+        });
+
     }
 
 
@@ -289,8 +314,14 @@ class Calendar extends ComponentBase
     {
         $locationId = $this->property('location_id');
         Log::info('Location ID: ' . $locationId);
+        
 
         $locationSelected = Location::find($locationId);
+
+        if($locationSelected->public_available == false){
+            Log::error('Location not available for online reservation.');
+            return [];
+        }
 
         if (!$locationSelected) {
             Log::error('Location not found.');

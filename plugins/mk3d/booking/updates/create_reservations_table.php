@@ -21,10 +21,14 @@ return new class extends Migration
             $table->timestamps();
             $table->string('customer_name', 255);
             $table->string('customer_email', 255);
-            $table->date('reservation_date');
+            $table->date('reservation_start_date');
+            $table->date('reservation_end_date');
             $table->time('reservation_start_time');
             $table->time('reservation_end_time');
+            $table->string('status')->default('Pending');
             $table->integer('location_id');
+            $table->string('recurring_group_id')->nullable();
+            $table->string('cancellation_token')->unique()->nullable(); // Add the cancellation_token field
         });
     }
 

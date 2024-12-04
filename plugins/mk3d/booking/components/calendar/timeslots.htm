@@ -1,19 +1,22 @@
-{{ date |date("l d F Y") }}
-{{ location_id }}
-{{ location_name }}
 <script>
 $(document).ready(function() {
     // Initialize reservation form modal
     initializeReservationForm();
     });
+$(function() {
+    $("#reservation_date").datepicker($.datepicker.regional["nl"]);
+});
 </script>
 
+
+
+<h6>{{ carbon(date)| date("l j F Y") }}</h6>
+
 <div class="form-group">
-    <label for="reservation_date">Datum</label>
     {% if date is not empty %}
     <input type="date" name="reservation_date" id="reservation_date" class="form-control" value="{{ date }}" required>
     {% else %}
-    <input type="date" name="reservation_date" id="reservation_date" class="form-control" value="{{ "now"|date("Y-m-d") }}" required>    
+    <input type="date" name="reservation_date" id="reservation_date" class="form-control" value="{{ "now"|date }}" required>    
     {% endif %}
 </div>
 <button id="show-timeslots" class="btn btn-primary">Show Timeslots</button>
@@ -123,7 +126,9 @@ $(document).ready(function() {
                     </div>
                     <div class="form-group">
                         <label for="recurring" class="label-custom">Reservering herhalen?</label>
-                        <input type="checkbox" value="false" name="recurring" id="recurring" class="form-control">
+                        <div class="checkbox-wrapper-1">
+                            <input type="checkbox" value="false" name="recurring" id="recurring">
+                        </div>
                     </div>
                     <div id="recurring_form" style="display: none;">
                         <div class="form-group">
@@ -142,7 +147,7 @@ $(document).ready(function() {
                         </div>
                     </div>                 
                     <br />                    
-                    <button type="submit" class="btn btn-primary">Submit Reservation</button>
+                    <button type="submit" class="btn btn-pri">Submit Reservation</button>
                 </form>
             </div>
         </div>

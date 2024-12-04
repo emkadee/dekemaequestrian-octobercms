@@ -1,0 +1,74 @@
+description = "Homepage layout"
+
+[staticMenu]
+code = "staticMenu"
+
+[staticPage]
+useContent = 1
+default = 0
+
+[contentBlock]
+link_text = "Lees meer"
+==
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{{ this.page.meta_title ?: placeholder('pageTitle') }}</title>
+        <meta name="description" content="{{ this.page.meta_description }}">            
+        {% partial 'site/head-links' %}
+    </head>
+
+    <body class="{{ 'page-'~this.page.id }} home">    
+        <div class="container-fluid bg_qui divheight_50">{% partial 'site/navigation' %}</div>    
+        <div class="container-fluid bg_pri pb-3">
+            <div class="container-lg">
+                <div class="row">
+                    <div class="col-md-12 logo">
+                        <img src="{{ 'assets/images/logo_home.png'|theme }}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 px-lg-5 top-image">{% placeholder TopImage title="TopImage" %}</div>
+                    <div class="col-md-6 pt-3 pt-sm-3 pt-md-0 px-lg-5 top-intro">{% placeholder TopIntro title="TopIntro" %}</div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid bg_qui">        
+            <div class="container-lg py-5">
+                <div class="row pt-4">
+                    <div class="col-md-6 px-lg-5 a-image">{% placeholder AImage title="A-Image" %}</div>                    
+                    <div class="col-md-6 px-lg-5 a-text">{% placeholder AText title="A-Text" %}</div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid bg_pri_light">        
+            <div class="container-lg py-5">
+                <div class="row pt-4">
+                    <div class="col-md-12 px-lg-5 b-text">{% placeholder BText title="B-Text" %}</div>           
+                </div>
+                <div class="row pt-4">
+                    <div class="col-md-12 px-lg-5 b-snippets">{% placeholder BSnippets title="B-Snippets" %}</div>           
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid bg_pri">        
+            <div class="row">
+                <div class="col-md-6 c-image">{% placeholder CImage title="C-Image" %}</div>                    
+                <div class="col-md-6 pt-3 pt-sm-3 pt-md-0 px-lg-5 c-text">{% placeholder CText title="C-Text" %}</div>
+            </div>
+        </div>
+        <div class="container-fluid bg_pri_light">        
+            <div class="container-lg">
+                <div class="row pt-4">
+                    <div class="col-md-12 d-text">{% placeholder DText title="D-Text" %}</div>           
+                </div>
+                <div class="row pt-1 pb-5">
+                    <div class="col-md-12 d-snippets">{% placeholder DSnippets title="D-Snippets" %}</div>           
+                </div>
+            </div>
+        </div>        
+        {% partial 'site/body-scripts' %}
+    </body>
+</html>
