@@ -1,0 +1,31 @@
+# ===================================
+#  Form Behavior Config
+# ===================================
+
+# Record name
+name: Message
+
+# Model Form Field configuration
+form: $/mk3d/contactform/models/message/fields.yaml
+
+# Model Class name
+modelClass: Mk3d\ContactForm\Models\Message
+
+# Default redirect location
+defaultRedirect: mk3d/contactform/messages
+
+# Create page
+create:
+    title: backend::lang.form.create_title
+    redirect: mk3d/contactform/messages/update/:id
+    redirectClose: mk3d/contactform/messages
+
+# Update page
+update:
+    title: backend::lang.form.update_title
+    redirect: mk3d/contactform/messages
+    redirectClose: mk3d/contactform/messages
+
+# Preview page
+preview:
+    title: backend::lang.form.preview_title

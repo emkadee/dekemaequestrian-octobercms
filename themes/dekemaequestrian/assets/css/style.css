@@ -337,6 +337,12 @@ h6 {
     .home .c-text .btn {
       width: 100%; } }
 
+.footer a {
+  color: #33312B !important; }
+
+.slider img {
+  padding: 3em; }
+
 /* BASIC BUTTON ELEMENT */
 a {
   color: #F0C523;
@@ -350,15 +356,24 @@ a:hover {
 
 .footer {
   padding: 2em;
-  flex-wrap: nowrap; }
+  flex-wrap: nowrap;
+  border-top: 1px solid #f3d253; }
   .footer a {
-    color: #fff !important;
+    color: #33312B;
     text-decoration: none;
-    font-family: "Ysabeau";
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
-    font-size: 0.9em; }
+    font-size: 1em; }
+  .footer img {
+    width: 70px;
+    height: 70px; }
+  .footer svg {
+    width: 70px;
+    height: 70px;
+    display: block; }
+  .footer .cls-1:hover {
+    fill: #33312B; }
   .footer a:hover {
     color: #F0C523 !important; }
   .footer h4 {

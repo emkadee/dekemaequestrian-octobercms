@@ -1,0 +1,32 @@
+# ===================================
+#  Form Field Definitions
+# ===================================
+
+fields:
+    id:
+        label: ID
+        disabled: true
+    name:
+        label: Name
+        span: auto
+        type: text
+        required: true
+    email:
+        label: Email
+        span: auto
+        type: email
+        required: true
+    phone:
+        label: Phone
+        span: auto
+        type: text
+        required: false
+    subject:
+        label: Subject
+        span: auto
+        type: text
+        required: true
+    message:
+        label: Message
+        size: long
+        required: true

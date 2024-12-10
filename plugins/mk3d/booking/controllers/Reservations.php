@@ -77,6 +77,22 @@ class Reservations extends Controller
         }
     }
 
+    public static function getStatusOptions()
+    {
+        $statusOptions = Reservation::getStatusOptions();        
+        return ['0' => 'All'] + $statusOptions;
+        
+    }
+
+    public static function applyStatusFilter($query, $scope)
+    {
+        if($scope->value == 0){
+            return $query;
+        } else {
+            return $query->where('status', '=', $scope->value);
+        }
+    }
+
 
 
     public function formExtendFields($form)

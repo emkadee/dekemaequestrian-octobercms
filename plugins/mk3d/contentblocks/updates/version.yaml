@@ -1,5 +1,6 @@
 v1.0.1:
-    - 'Initialize plugin'
+    - "Initialize plugin"
 v1.0.2:
-    - 'Created table mk3d_contentblocks_items'
+    - "Created table mk3d_contentblocks_items"
     - builder_table_create_mk3d_contentblocks_items.php
+    - seed_reviews_and_blocks.php

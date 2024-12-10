@@ -1,8 +1,9 @@
 <div data-control="toolbar">
     <a
         href="<?= Backend::url('mk3d/contentblocks/blocks/create') ?>"
-        class="btn btn-primary oc-icon-plus">
-        <?= e(trans('backend::lang.form.create')) ?>
+        class="btn btn-primary">
+        <i class="icon-plus"></i>
+        <?= __("New :name", ['name' => 'Block']) ?>
     </a>
     <button
         class="btn btn-default oc-icon-trash-o"

@@ -128,16 +128,30 @@ class Reservation extends Model
         }
     }
 
-
-    public function getStatusLabelAttribute()
+    // Static method to get status labels
+    public static function getStatusLabels()
     {
-        $statuses = [
+        return [
             'pending' => 'Pending',
             'confirmed' => 'Confirmed',
             'cancelled' => 'Cancelled'
         ];
+    }
 
+
+    // Accessor to get the status label
+    public function getStatusLabelAttribute()
+    {
+        $statuses = self::getStatusLabels();
         return $statuses[$this->status] ?? $this->status;
+    }
+
+
+    // Static method to get status options including 'All'
+    public static function getStatusOptions()
+    {
+        $statusOptions = self::getStatusLabels();
+        return ['0' => 'All'] + $statusOptions;
     }
 
 

@@ -1,0 +1,14 @@
+<link rel="stylesheet" type="text/css" href="{{ '/plugins/mk3d/contentblocks/assets/slick/slick.css' }}" />
+<link rel="stylesheet" type="text/css" href="{{ '/plugins/mk3d/contentblocks/assets/slick/slick-theme.css' }}" />
+
+<div class="slider">
+{% if sliderImages is not empty %}
+     {% for image in sliderImages %}
+        <img src="{{ image.publicUrl }}">
+    {% endfor %}
+{% else %}
+    <p>No images found.</p>
+{% endif %}
+</div>
+
+

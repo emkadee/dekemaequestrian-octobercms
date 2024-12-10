@@ -1,0 +1,17 @@
+# ===================================
+#  Form Field Definitions
+# ===================================
+
+fields:
+    title:
+        label: Title
+        type: text
+        span: left
+    subject:
+        label: Subject
+        type: text
+        span: right
+    message:
+        label: Message
+        type: textarea
+        span: full

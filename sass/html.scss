@@ -120,20 +120,21 @@ h6 {
     }
 
     .c-image {
-        padding: 0 !important;       
+        padding: 0 !important;
 
         @include for_breakpoint(xs sm) {
             img {
                 width: calc(100vw + (-.75* var(--bs-gutter-x))) !important;
-                margin-left : calc(-.5* var(--bs-gutter-x)) !important;                
+                margin-left: calc(-.5* var(--bs-gutter-x)) !important;
             }
-        }      
+        }
 
         p {
             margin: 0 !important;
         }
 
     }
+
     .c-text {
         h1 {
             color: $quiColor;
@@ -159,8 +160,18 @@ h6 {
     }
 }
 
+.footer {
+    a {
+        color: $quiColor !important;
+    }
+}
 
 
+.slider {
+    img {
+        padding: 3em;
+    }
+}
 
 
 
@@ -182,15 +193,30 @@ a:hover {
 .footer {
     padding: 2em;
     flex-wrap: nowrap;
+    border-top: 1px solid lighten($priColor, 10%);
 
     a {
-        color: #fff !important;
+        color: $quiColor;
         text-decoration: none;
-        font-family: "Ysabeau";
         font-optical-sizing: auto;
         font-weight: 400;
         font-style: normal;
-        font-size: 0.9em;
+        font-size: 1em;
+    }
+
+    img {
+        width: 70px;
+        height: 70px;
+    }
+
+    svg {
+        width: 70px;
+        height: 70px;
+        display: block;
+    }
+
+    .cls-1:hover {
+        fill: $quiColor;
     }
 
     a:hover {

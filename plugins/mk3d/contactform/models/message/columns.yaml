@@ -1,0 +1,40 @@
+# ===================================
+#  List Column Definitions
+# ===================================
+
+columns:
+    id:
+        label: ID
+        searchable: true
+    name:
+        label: Name
+        searchable: true
+    email:
+        label: Email
+        searchable: true
+    phone:
+        label: Phone
+        searchable: true
+    subject:
+        label: Subject
+        searchable: true
+    message:
+        label: Message
+        searchable: true
+    created_at:
+        label: Date
+        searchable: true
+    is_read:
+        label: Read
+        searchable: true
+    status:
+        label: Status
+        searchable: true
+
+        options:
+            new: New
+            read: Read
+            replied: Replied
+            closed: Closed
+        width: 100px
+        cssClass: center

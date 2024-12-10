@@ -41,18 +41,6 @@ class BlockSnippet extends ComponentBase
                 'description' => 'Text for the link',
                 'type'        => 'string',
                 'default'     => 'Lees meer'
-            ],
-            'block_style' => [
-                'title'       => 'Block style',
-                'description' => 'Select a style for the block',
-                'type'        => 'dropdown',
-                'options' => [
-                            'simple'    => 'Simple',
-                            'textimage' => 'Text and image',
-                            'card'      => 'Card',
-                            'button'    => 'Button',
-                            'review'    => 'Review',
-                            ],
             ]
         ];
     }
@@ -94,7 +82,6 @@ class BlockSnippet extends ComponentBase
         $this->page['staticPageUrl'] = $this->property('static_page_url');
         $this->page['url'] = $this->property('url');
         $this->page['linkText'] = $this->property('link_text');
-        $this->page['blockStyle'] = $this->property('block_style');
     }
 
     public function loadBlocks($id)

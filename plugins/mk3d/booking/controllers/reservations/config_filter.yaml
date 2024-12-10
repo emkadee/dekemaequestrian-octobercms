@@ -11,3 +11,10 @@ scopes:
     optionsMethod: "Mk3d\\Booking\\Controllers\\Reservations::getLocationOptions"
     modelScope: "Mk3d\\Booking\\Controllers\\Reservations::applyLocationFilter"
     default: 0
+
+  status:
+    label: Status
+    type: dropdown
+    optionsMethod: "Mk3d\\Booking\\Controllers\\Reservations::getStatusOptions"
+    modelScope: "Mk3d\\Booking\\Controllers\\Reservations::applyStatusFilter"
+    default: 0

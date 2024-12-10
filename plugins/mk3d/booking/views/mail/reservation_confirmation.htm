@@ -24,9 +24,9 @@ layout = "mk3d.booking::mail.booking_layout"
     {% for reservation in reservation_details %}
     <tr class="reservation">
         {% if reservation.date == reservation.end_date %}
-            <td align="left">{{ reservation.date|format_datetime(locale='nl',pattern="EEEE dd MMMM YYYY") }} van {{ reservation.time|date("H:i") }} tot {{ reservation.end_time|date("H:i") }} uur</td>
+            <td align="left">{{ reservation.date|date("Y m d") }} van {{ reservation.time|date("H:i") }} tot {{ reservation.end_time|date("H:i") }} uur</td>
         {% else %}
-            <td align="left">{{ reservation.date|format_datetime(locale='nl',pattern="EEEE dd MMMM YYYY") }} om {{ reservation.time|date("H:i") }} tot {{ reservation.end_date|date('l j F Y', 'Europe/Amsterdam') }} om {{ reservation.end_time|date("H:i") }} uur</td>
+            <td align="left">{{ reservation.date|date("Y m d") }} om {{ reservation.time|date("H:i") }} tot {{ reservation.end_date|date('l j F Y', 'Europe/Amsterdam') }} om {{ reservation.end_time|date("H:i") }} uur</td>
         {% endif %}
         <td align="left">{{ reservation.location }}</td>
         <td align="left">{{ reservation.status_message }}</td>

@@ -1,0 +1,31 @@
+# ===================================
+#  Form Behavior Config
+# ===================================
+
+# Record name
+name: Answer
+
+# Model Form Field configuration
+form: $/mk3d/contactform/models/answer/fields.yaml
+
+# Model Class name
+modelClass: Mk3d\ContactForm\Models\Answer
+
+# Default redirect location
+defaultRedirect: mk3d/contactform/answers
+
+# Create page
+create:
+    title: backend::lang.form.create_title
+    redirect: mk3d/contactform/answers/update/:id
+    redirectClose: mk3d/contactform/answers
+
+# Update page
+update:
+    title: backend::lang.form.update_title
+    redirect: mk3d/contactform/answers
+    redirectClose: mk3d/contactform/answers
+
+# Preview page
+preview:
+    title: backend::lang.form.preview_title

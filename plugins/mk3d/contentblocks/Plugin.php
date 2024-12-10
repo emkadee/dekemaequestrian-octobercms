@@ -66,12 +66,6 @@ class Plugin extends PluginBase
                         'url'         => Backend::url('mk3d/contentblocks/blocks'),
                         'permissions' => ['mk3d.contentblocks.*'],
                     ],
-                    'Buttons' => [
-                        'label'       => 'Buttons',
-                        'icon'        => 'icon-link',
-                        'url'         => Backend::url('mk3d/contentblocks/buttons'),
-                        'permissions' => ['mk3d.contentblocks.*'],
-                    ],
                     'Reviews' => [
                         'label'       => 'Reviews',
                         'icon'        => 'icon-comment',
@@ -92,6 +86,7 @@ class Plugin extends PluginBase
             'Mk3d\Contentblocks\Components\BlockSnippet' => 'contentBlock',
             'Mk3d\Contentblocks\Components\ButtonSnippet' => 'buttonBlock',
             'Mk3d\Contentblocks\Components\ReviewSnippet' => 'reviewBlock',
+            'Mk3d\Contentblocks\Components\SliderSnippet' => 'sliderBlock',
         ];
     }
     
@@ -101,6 +96,7 @@ class Plugin extends PluginBase
             'Mk3d\Contentblocks\Components\BlockSnippet' => 'contentBlock',
             'Mk3d\Contentblocks\Components\ButtonSnippet' => 'buttonBlock',
             'Mk3d\Contentblocks\Components\ReviewSnippet' => 'reviewBlock',
+            'Mk3d\Contentblocks\Components\SliderSnippet' => 'sliderBlock',
         ];
     }
 
