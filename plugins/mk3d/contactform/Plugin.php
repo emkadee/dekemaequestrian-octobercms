@@ -57,6 +57,16 @@ class Plugin extends PluginBase
         ];
     }
 
+    public function registerFormWidgets()
+    {
+        return [
+            'Mk3d\ContactForm\FormWidgets\StandardReply' => [
+                'label' => 'Rich Editor',
+                'code' => 'standardreply'
+            ]
+        ];
+    }
+
     /**
      * registerPermissions used by the backend.
      */
@@ -92,13 +102,13 @@ class Plugin extends PluginBase
                         'label' => 'Messages',
                         'icon' => 'icon-copy',
                         'url' => Backend::url('mk3d/contactform/messages'),
-                        'permissions' => ['mk3d.booking.*'],
+                        'permissions' => ['mk3d.contactform.*'],
                     ],
-                    'answers' => [
-                        'label' => 'Answers',
+                    'replies' => [
+                        'label' => 'Replies',
                         'icon' => 'icon-copy',
-                        'url' => Backend::url('mk3d/contactform/answers'),
-                        'permissions' => ['mk3d.booking.*'],
+                        'url' => Backend::url('mk3d/contactform/replies'),
+                        'permissions' => ['mk3d.contactform.*'],
                     ]
 
                 ]

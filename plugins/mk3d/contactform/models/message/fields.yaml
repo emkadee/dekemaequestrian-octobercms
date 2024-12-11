@@ -3,30 +3,41 @@
 # ===================================
 
 fields:
-    id:
-        label: ID
-        disabled: true
     name:
         label: Name
         span: auto
         type: text
         required: true
+        disabled: true
     email:
         label: Email
         span: auto
         type: email
         required: true
+        disabled: true
     phone:
         label: Phone
         span: auto
         type: text
         required: false
+        disabled: true
     subject:
         label: Subject
         span: auto
         type: text
         required: true
+        disabled: true
     message:
         label: Message
         size: long
         required: true
+        disabled: true
+    selector:
+        label: Standard reply
+        type: standardreply
+        span: left
+    reply_message:
+        label: Reply message
+        type: textarea
+        size: huge
+        default: "test"

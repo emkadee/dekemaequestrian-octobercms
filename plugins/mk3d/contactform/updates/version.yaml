@@ -3,5 +3,5 @@ v1.0.2:
   - "Created table mk3d_contactform_messages"
   - create_messages_table.php
 v1.0.3:
-  - "Created table mk3d_contactform_answers"
-  - create_answers_table.php
+  - "Created table mk3d_contactform_replies"
+  - create_replies_table.php
