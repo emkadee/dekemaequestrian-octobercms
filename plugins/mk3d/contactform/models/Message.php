@@ -26,5 +26,30 @@ class Message extends Model
 
     protected $fillable = ['name','email','phone','subject','message', 'is_read', 'status'];
 
+    // Static method to get status labels
+    public static function getStatusLabels()
+    {
+        return [
+            'new' => 'New',
+            'replied' => 'Replied',
+            'read' => 'Read'
+        ];
+    }
+
+    // Accessor to get the status label
+    public function getStatusLabelAttribute()
+    {
+        $statuses = self::getStatusLabels();
+        return $statuses[$this->status] ?? $this->status;
+    }
+
+
+    // Static method to get status options including 'All'
+    public static function getStatusOptions()
+    {
+        $statusOptions = self::getStatusLabels();
+        return ['0' => 'All'] + $statusOptions;
+    }
+
 
 }

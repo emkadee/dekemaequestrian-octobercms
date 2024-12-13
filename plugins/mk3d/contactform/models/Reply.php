@@ -22,9 +22,8 @@ class Reply extends Model
     
      public $rules = [
         'title' => 'required|string|max:255',
-        'subject' => 'required|string|max:255',
         'message' => 'required|string'
     ];
 
-    protected $fillable = ['title','subject','message'];
+    protected $fillable = ['title','message'];
 }

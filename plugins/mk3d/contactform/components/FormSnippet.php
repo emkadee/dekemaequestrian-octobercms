@@ -61,7 +61,6 @@ class FormSnippet extends ComponentBase
             'phone' => Input::get('phone'),
             'subject' => Input::get('subject'),
             'message' => Input::get('message'),
-            'is_read' => Input::get('is_read', false),
             'status' => Input::get('status', 'new'),
         ]);
 

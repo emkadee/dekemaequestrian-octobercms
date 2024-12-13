@@ -1,12 +1,4 @@
 <div data-control="toolbar loader-container">
-    <a
-        href="<?= Backend::url('mk3d/contactform/messages/create') ?>"
-        class="btn btn-primary">
-        <i class="icon-plus"></i>
-        <?= __("New :name", ['name' => 'Message']) ?>
-    </a>
-
-    <div class="toolbar-divider"></div>
 
     <button
         class="btn btn-secondary"
@@ -19,4 +11,23 @@
         <i class="icon-delete"></i>
         <?= __("Delete") ?>
     </button>
+    <button
+        class="btn btn-secondary"
+        data-request="onDeleteOldMails"
+        data-request-message="<?= __("Deleting...") ?>"
+        data-request-confirm="<?= __("Are you sure?") ?>">
+        <i class="icon-delete"></i>
+        <?= __("Delete all mails older than 30 days") ?>
+    </button>
+    <button
+        class="btn btn-secondary"
+        data-request="onDeleteOldMailsAndLogs"
+        data-request-message="<?= __("Deleting...") ?>"
+        data-request-confirm="<?= __("Are you sure? This will also remove the maillogs related to this emails.") ?>">
+        <i class="icon-delete"></i>
+        <?= __("Delete all mails and logs older than 30 days") ?>
+    </button>
 </div>
+
+
+

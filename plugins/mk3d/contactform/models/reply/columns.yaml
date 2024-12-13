@@ -3,15 +3,10 @@
 # ===================================
 
 columns:
-    id:
-        label: ID
-        searchable: true
     title:
         label: Title
         searchable: true
-    subject:
-        label: Subject
-        searchable: true
     message:
-        label: Message
-        searchable: true
+        label: HTML Content
+        type: partial
+        path: '$/mk3d/contactform/partials/_column_html_content.htm'

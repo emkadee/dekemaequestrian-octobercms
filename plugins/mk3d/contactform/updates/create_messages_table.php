@@ -24,8 +24,8 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('subject');
             $table->text('message');
-            $table->boolean('is_read')->default(false);
             $table->string('status')->default('new');
+            $table->integer('maillog_id')->nullable();
         });
     }
 

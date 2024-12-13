@@ -102,26 +102,26 @@ class Plugin extends PluginBase
             'booking' => [
                 'label' => 'Booking',
                 'url' => Backend::url('mk3d/booking/reservations'),
-                'icon' => 'icon-leaf',
+                'icon' => 'icon-calendar-3',
                 'permissions' => ['mk3d.booking.*'],
                 'order' => 500,
 
                 'sideMenu' => [
                     'reservations' => [
                         'label' => 'Reservations',
-                        'icon' => 'icon-copy',
+                        'icon' => 'icon-calendar-enable',
                         'url' => Backend::url('mk3d/booking/reservations'),
                         'permissions' => ['mk3d.booking.*'],
                     ],
                     'locations' => [
                         'label' => 'Locations',
-                        'icon' => 'icon-copy',
+                        'icon' => 'icon-location-target',
                         'url' => Backend::url('mk3d/booking/locations'),
                         'permissions' => ['mk3d.booking.*'],
                     ],
                     'calendar' => [
                         'label' => 'Calendar',
-                        'icon' => 'icon-copy',
+                        'icon' => 'icon-calendar-clock',
                         'url' => Backend::url('mk3d/booking/reservations/calendar'),
                         'permissions' => ['mk3d.booking.*'],
                     ]

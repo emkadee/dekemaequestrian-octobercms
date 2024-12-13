@@ -1,6 +1,12 @@
-
-<div class="form-group">
+<div class="row mb-2">
+    <hr>
+    <div class="col-md-4">
+        <div class="form-group">
             <label for="replyDropdown">Select a reply</label>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="form-group">
             <select id="replyDropdown" name="reply_id" class="form-control">\
                 <option value="">Select a reply</option>
                 <?php foreach ($replyTitles as $id => $title): ?>
@@ -8,15 +14,17 @@
                 <?php endforeach; ?>
             </select>
         </div>
-
-        <div id="example"></div>
-
-        <!-- Add a button to send the email -->
-<button id="sendEmailButton" class="btn btn-primary">Send Email</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-8">
+        <button id="sendEmailButton" class="btn btn-primary">Send Email</button>
+    </div>
+</div>
 
 <!-- Hidden input field to store the message ID -->
 <input type="hidden" id="message_id" value="<?= $messageId ?>">
-
 <script src="http://dev.dekemaequestrian.nl/modules/backend/formwidgets/richeditor/assets/js/build-min.js"></script>
 
 
@@ -29,9 +37,10 @@
     }
 </style>
 
+
 <script>
     $(document).ready(function() {
-        console.log('select_and_show_answers.php loaded');
+        
         
         // Initialize Froala Editor with specific buttons
         var editorElement = $('#Form-field-Message-reply_message');
@@ -60,8 +69,6 @@
         $('#sendEmailButton').on('click', function() {
             var messageId = $('#message_id').val(); // Get the message ID from the hidden input
             var emailContent = editorElement.froalaEditor('html.get'); // Get the content from the Froala editor
-
-            alert(emailContent);
 
             $.request('onSendEmail', {
                 data: { message_id: messageId, email_content: emailContent },

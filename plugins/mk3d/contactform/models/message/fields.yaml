@@ -3,35 +3,10 @@
 # ===================================
 
 fields:
-    name:
-        label: Name
-        span: auto
-        type: text
-        required: true
-        disabled: true
-    email:
-        label: Email
-        span: auto
-        type: email
-        required: true
-        disabled: true
-    phone:
-        label: Phone
-        span: auto
-        type: text
-        required: false
-        disabled: true
-    subject:
-        label: Subject
-        span: auto
-        type: text
-        required: true
-        disabled: true
     message:
-        label: Message
-        size: long
-        required: true
-        disabled: true
+        label:
+        type: partial
+        path: '$/mk3d/contactform/partials/_field_html_content_message.htm'
     selector:
         label: Standard reply
         type: standardreply

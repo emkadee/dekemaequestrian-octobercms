@@ -5,6 +5,8 @@
 # Model List Column configuration
 list: $/mk3d/contactform/models/message/columns.yaml
 
+filter: config_filter.yaml
+
 # Model Class name
 modelClass: Mk3d\ContactForm\Models\Message
 

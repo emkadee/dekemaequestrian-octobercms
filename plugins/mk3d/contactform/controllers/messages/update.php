@@ -15,34 +15,7 @@
 
         <div class="form-buttons">
             <div data-control="loader-container">
-                <button
-                    type="submit"
-                    data-request="onSave"
-                    data-request-data="{ redirect: 0 }"
-                    data-hotkey="ctrl+s, cmd+s"
-                    data-request-message="<?= __("Saving :name...", ['name' => $formRecordName]) ?>"
-                    class="btn btn-primary">
-                    <?= __("Save") ?>
-                </button>
-                <button
-                    type="button"
-                    data-request="onSave"
-                    data-request-data="{ close: 1 }"
-                    data-browser-redirect-back
-                    data-hotkey="ctrl+enter, cmd+enter"
-                    data-request-message="<?= __("Saving :name...", ['name' => $formRecordName]) ?>"
-                    class="btn btn-default">
-                    <?= __("Save & Close") ?>
-                </button>
-                <button
-                    type="button"
-                    class="oc-icon-delete btn-icon danger pull-right"
-                    data-request="onDelete"
-                    data-request-message="<?= __("Deleting :name...", ['name' => $formRecordName]) ?>"
-                    data-request-confirm="<?= __("Delete this record?") ?>">
-                </button>
                 <span class="btn-text">
-                    <span class="button-separator"><?= __("or") ?></span>
                     <a
                         href="<?= Backend::url('mk3d/contactform/messages') ?>"
                         class="btn btn-link p-0">

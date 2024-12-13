@@ -4,10 +4,14 @@ use BackendMenu;
 use Backend\Classes\Controller;
 use Mk3d\ContactForm\Models\Reply;
 use Mk3d\ContactForm\Models\Message;
+use Mk3d\ContactForm\Models\Maillog;
 use Log;
 use Mail;
 use Session;
-
+use Markdown;
+use Carbon\Carbon;
+use Redirect;
+use Config;
 /**
  * Messages Backend Controller
  *
@@ -18,24 +22,42 @@ class Messages extends Controller
     public $implement = [
         \Backend\Behaviors\FormController::class,
         \Backend\Behaviors\ListController::class,
-    ];
+    ];    
 
 
-
-    /**
-     * @var string formConfig file
-     */
     public $formConfig = 'config_form.yaml';
-
-    /**
-     * @var string listConfig file
-     */
     public $listConfig = 'config_list.yaml';
+    public $filterConfig = 'config_filter.yaml';
 
-    /**
-     * @var array required permissions
-     */
+
     public $requiredPermissions = ['mk3d.contactform.messages'];
+/* 
+    public function onRun()
+    {
+        // Define the scope for the status filter
+        $scope = 'New'; // Replace 'default_status' with your desired default status
+
+        // Apply the status filter using the static method
+        Message::applyStatusFilter(Message::query(), $scope);
+    }
+ */
+
+
+    public static function getStatusOptions()
+    {
+        $statusOptions = Message::getStatusOptions();        
+        return ['0' => 'All'] + $statusOptions;        
+    }
+
+    public static function applyStatusFilter($query, $scope)
+    {
+        if($scope->value == 0){
+            return $query;
+        } else {
+            return $query->where('status', '=', $scope->value);
+        }
+    }
+
 
     /**
      * __construct the controller
@@ -47,19 +69,6 @@ class Messages extends Controller
         BackendMenu::setContext('Mk3d.ContactForm', 'contactform', 'messages');
     }
 
-    public function formExtendFields($form)
-    {
-        
-       /*  $form->addFields([
-            'replies' => [
-                'label' => 'Replies',
-                'type' => 'partial',
-                'path' => '$/mk3d/contactform/controllers/messages/select_and_show_replies.php',
-                'span' => 'full',
-                'context' => ['update'],
-            ]
-        ]); */
-    }
 
     public function update($recordId = null)
     {
@@ -91,64 +100,135 @@ class Messages extends Controller
     }
     public function onSendEmail()
     {
+        Log::info('onSendEmail called');
         $messageId = post('message_id');
         $mailContent = post('email_content');
 
         $message = Message::find($messageId);
 
         Log::info('Message ID: '.$messageId);	
+        Log::info('Mail content: '.$mailContent);
 
         if ($message) {
+            Log::info('Message found');
             $email = $message->email;
             $name = $message->name;
             $mailSubject = 'Re: ' . $message->subject;
 
-
-            // Use the Mail facade to send the email
-            Mail::send('mk3d.contactform::mail.reply', ['content' => $mailContent], function($message) use ($email) {
-                $message->to($email);
-                $message->subject('Reply to your message');
-            });
+            Log::info('Email: '.$email);
+            Log::info('Name: '.$name);
+            Log::info('Subject: '.$mailSubject);
+            Log::info('Content: '.$mailContent);
 
 
             /* // Use the Mail facade to send the email
+            Mail::send('mk3d.contactform::mail.reply', ['content' => $mailContent], function($message) use ($email) {
+                $message->to($email);
+                $message->subject('Reply to your message');
+            }); */
+
+            // Use the Mail facade to send the email
             $this->sendReservationConfirmationEmail(
                 $name,
                 $email, 
                 $mailSubject, 
                 $mailContent
             );
- */
+            if ($message->maillog_id) {
+                $maillog = Maillog::find($message->maillog_id);
+                $maillog_id = $maillog->maillog_id;
 
-            $message->status = 'Reply sent';
+                Log::info ('Maillog not found, add content to maillog with id ' . $maillog_id);
+
+                $mailContentComplete = $maillog->message . '<hr>' . 'Reply send on : <b>' . date('Y-m-d H:i:s') . '</b>' . '<hr><br />' . $mailContent;
+                $maillog->message = $mailContentComplete;
+                $maillog->save();
+
+            } else {
+                
+                $maillog = new Maillog();                         
+
+                $maillog->receiver = $name;
+                $maillog->receiver_email = $email;
+                $maillog->subject = $mailSubject;
+                $maillog->message = '<hr>' . 'Reply send on : <b>' . date('Y-m-d H:i:s') . '</b>' . '<hr><br />' . $mailContent;
+                $maillog->save();
+
+                $maillog_id = $maillog->id;
+                Log::info ('Maillog not found, created a new one with id ' . $maillog_id);
+            }            
+
+            $message->maillog_id = $maillog_id;
+            $message->status = 'replied';
             $message->save(); 
 
-            // Set a flash message
-            Session::flash('success', 'Email sent successfully!');
-
-            redirect('backend/mk3d/contactform/messages');
+            return Redirect::to('http://dev.dekemaequestrian.nl/adminde/mk3d/contactform/messages');
 
         }
+        return Redirect::to('adminde/mk3d/contactform/messages');
 
-        return ['status' => 'error'];
+
     }
+
+    public function onDeleteOldMails()
+    {
+
+        $cutoffDate = Carbon::now()->subDays(30);
+        $oldMessages = Message::where('created_at', '<', $cutoffDate)->get();
+
+        foreach ($oldMessages as $oldMessage) {
+            $oldMessage->delete();
+        }
+
+        return $this->listRefresh();
+    }
+
+    public function onDeleteOldMailsAndLogs()
+    {
+
+        $cutoffDate = Carbon::now()->subDays(30);
+        $oldMessages = Message::where('created_at', '<', $cutoffDate)->get();
+
+        foreach ($oldMessages as $oldMessage) {
+            $oldMessageMaillog = Maillog::find($oldMessage->maillog_id);
+            $oldMessageMaillog->delete();
+            $oldMessage->delete();
+        }
+
+        return $this->listRefresh();
+    }
+
 
     // *** MAIL SENDING METHODS *** //
     //SEND RESERVATION CONFIRMATION EMAIL
     protected function sendReservationConfirmationEmail($name, $email, $mailSubject, $mailContent)
     {
+        // Ensure the content is not null
+        if ($mailContent !== null) {
 
+            // Ensure proper Markdown structure
+            $mailContent = $this->ensureProperMarkdownStructure($mailContent);
 
-        Mail::send('mk3d.contactform::mail.reply', [
-            'mailContent' => $mailContent,
-        ], 
-        
-            function($mailContent) use ($email, $name, $mailSubject) {
-                $mailContent->to($email, $name);
-                $mailContent->subject($mailSubject);
-        });
+            // Parse the Markdown content to HTML
+            $htmlContent = new Markdown();           
+            $htmlContent = Markdown::parse($mailContent);
 
+            // Use the Mail facade to send the email
+            Mail::send([], [], function($message) use ($email, $name, $mailSubject, $htmlContent) {
+                $message->to($email, $name);
+                $message->subject($mailSubject);
+                $message->html($htmlContent); // Use the html method to set the HTML content
+            });
+        } else {
+            // Log an error if content is null
+            error_log('Email content is null.');
+        }
     }
-        
+
+    private function ensureProperMarkdownStructure($content)
+    {
+        // Ensure each HTML node is on its own line
+        return preg_replace('/>(\s*)</', ">\n<", $content);
+    }     
 
 }

@@ -93,24 +93,29 @@ class Plugin extends PluginBase
         return [
             'contactform' => [
                 'label' => 'ContactForm',
-                'url' => Backend::url('mk3d/contactform/messages'),
-                'icon' => 'icon-leaf',
+                'url' => Backend::url('mk3d/contactform/templates'),
+                'icon' => 'icon-envelope',
                 'permissions' => ['mk3d.contactform.*'],
                 'order' => 500,
                 'sideMenu' => [
                     'messsages' => [
                         'label' => 'Messages',
-                        'icon' => 'icon-copy',
+                        'icon' => 'icon-mail-templates',
                         'url' => Backend::url('mk3d/contactform/messages'),
                         'permissions' => ['mk3d.contactform.*'],
                     ],
                     'replies' => [
-                        'label' => 'Replies',
-                        'icon' => 'icon-copy',
+                        'label' => 'Standard replies',
+                        'icon' => 'icon-mail-reply',
                         'url' => Backend::url('mk3d/contactform/replies'),
                         'permissions' => ['mk3d.contactform.*'],
-                    ]
-
+                    ],
+                    'maillogs' => [
+                        'label' => 'Mail log',
+                        'icon' => 'icon-mail-messages',
+                        'url' => Backend::url('mk3d/contactform/maillogs'),
+                        'permissions' => ['mk3d.contactform.*'],
+                    ],
                 ]
             ],
         ];

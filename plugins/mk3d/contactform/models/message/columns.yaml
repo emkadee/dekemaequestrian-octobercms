@@ -3,9 +3,6 @@
 # ===================================
 
 columns:
-    id:
-        label: ID
-        searchable: true
     name:
         label: Name
         searchable: true
@@ -20,21 +17,20 @@ columns:
         searchable: true
     message:
         label: Message
-        searchable: true
+        type: partial
+        path: '$/mk3d/contactform/partials/_column_html_content.htm'
     created_at:
         label: Date
         searchable: true
-    is_read:
-        label: Read
+    maillog_id:
+        label: Maillog ID
         searchable: true
     status:
         label: Status
         searchable: true
-
         options:
             new: New
             read: Read
             replied: Replied
-            closed: Closed
         width: 100px
         cssClass: center
