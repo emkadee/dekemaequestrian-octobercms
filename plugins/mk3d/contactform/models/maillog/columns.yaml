@@ -1,0 +1,21 @@
+# ===================================
+#  List Column Definitions
+# ===================================
+
+columns:
+    id:
+        label: ID
+        type: number
+        searchable: true
+    receiver:
+        label: Receiver
+        type: text
+        disabled: true
+    subject:    
+        label: Subject
+        type: text
+        disabled: true
+    created_at:
+        label: Send Date
+        type: datetime
+        disabled: true

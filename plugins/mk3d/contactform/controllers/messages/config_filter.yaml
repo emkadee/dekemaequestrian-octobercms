@@ -1,0 +1,7 @@
+scopes:
+  status:
+    label: Status
+    type: dropdown
+    optionsMethod: "Mk3d\\Contactform\\Controllers\\Messages::getStatusOptions"
+    modelScope: "Mk3d\\Contactform\\Controllers\\Messages::applyStatusFilter"
+    default: 'New'

@@ -1,0 +1,10 @@
+# ===================================
+#  Form Field Definitions
+# ===================================
+
+fields:
+    message:
+        label:
+        type: partial
+        path: '$/mk3d/contactform/partials/_field_html_content.htm'
+

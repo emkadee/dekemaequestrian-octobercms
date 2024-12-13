@@ -1,0 +1,31 @@
+# ===================================
+#  Form Behavior Config
+# ===================================
+
+# Record name
+name: Maillog
+
+# Model Form Field configuration
+form: $/mk3d/contactform/models/maillog/fields.yaml
+
+# Model Class name
+modelClass: Mk3d\Contactform\Models\Maillog
+
+# Default redirect location
+defaultRedirect: mk3d/contactform/maillog
+
+# Create page
+create:
+    title: backend::lang.form.create_title
+    redirect: mk3d/contactform/maillog/update/:id
+    redirectClose: mk3d/contactform/maillog
+
+# Update page
+update:
+    title: backend::lang.form.update_title
+    redirect: mk3d/contactform/maillog
+    redirectClose: mk3d/contactform/maillog
+
+# Preview page
+preview:
+    title: backend::lang.form.preview_title

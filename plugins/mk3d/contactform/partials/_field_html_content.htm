@@ -1,0 +1,20 @@
+<div class="row mb-3">
+    <div class="col-md-2">Recipient : </a></div>
+    <div class="col-md-10"><b><?= $formModel->receiver ?></b> - <a href="mailto:<?= $formModel->receiver_email ?>"><?= $formModel->receiver_email ?></a></div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-2">Datum : </div>
+    <div class="col-md-10"><?= $formModel->created_at ?></div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-2">Message</div>
+    <div class="col-md-10">
+        <div class="pb-3">
+            <b><?= $formModel->subject ?></b>
+        </div>
+        <div class="border border-dark p-3">
+            <?= $formModel->message ?>
+        </div>
+    </div>
+</div>
+
