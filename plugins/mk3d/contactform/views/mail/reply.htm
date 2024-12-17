@@ -1,24 +1,96 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Template</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            font-size: 0.8em;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            border: 1px solid #ddd;
+        }
+        .header {
+            background-color: #F0C523;
+            padding: 20px;
+            text-align: center;
+        }
+        .header img {
+            max-width: 100px;
+        }
+        .content {
+            padding: 20px;
+        }
+        .footer {
+            background-color: #33312B;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+        .footer a {
+            color: #F0C523;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 20px 0;
+            background-color: #EAA044;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .button:hover {
+            background-color: #8C7F4F;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            padding: 1em;
+            border: 1px solid #efefef;
+        }
+        table th, .table td {
+            border: 1px solid #ddd !important;
+            padding: 10px;
+            text-align: left;
+        }
+        table th {
+            background-color: #F0C523;
+            color: #33312B;
+        }
+        table td {
+            padding: 10px;
+        }
+        table tr:nth-child(odd) {
+            background-color: #efefef;
+        }
+    </style>
 </head>
 <body>
-    <table class="wrapper layout-default" width="90%" cellpadding="2" cellspacing="0">
-        <tr>
-            <td align="center">
-                {{ content|raw }}
-            </td>
-        </tr>
-        <tr>
-            <td align="center">
-                &copy; {{ "now"|date("Y") }} {{ appName }}. All rights reserved.
-            </td>
-        </tr>
-    </table>
-</body>
-</html>
+    <div class="container">
+        <div class="header">
+            <img height="80px" src="{{ message.embed('themes/dekemaequestrian/assets/images/logo_home.png') }}" alt="Logo">
+        </div>
+        <div class="content">
+            {{ content|raw }}
+        </div>
+        <div class="footer">
+            <p>&copy; {{ "now"|date("Y") }} Dekema Equestrian</p>
+            <p><a href="mailto:info@dekemaequestrian.com">info@dekemaequestrian.nl</a></p>
+        </div>
     </div>
 </body>
 </html>

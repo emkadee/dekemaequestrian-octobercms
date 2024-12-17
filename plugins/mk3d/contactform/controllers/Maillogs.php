@@ -4,6 +4,8 @@ use BackendMenu;
 use Backend\Classes\Controller;
 use Carbon\Carbon;
 use Mk3d\ContactForm\Models\Maillog;
+use Mk3d\ContactForm\Models\Message;
+use Log;
 
 /**
  * Maillog Backend Controller
@@ -39,10 +41,25 @@ class Maillogs extends Controller
         $oldMaillogs = Maillog::where('created_at', '<', $cutoffDate)->get();
 
         foreach ($oldMaillogs as $oldMaillog) {
+            $message = Message::where('maillog_id', $oldMaillog->id)->first();
+            $message->delete();
             $oldMaillog->delete();
         }
 
         return $this->listRefresh();
+    }
+
+    public function update($recordId = null, $context = null)
+    {
+        Log::info('Maillog onUpdate called with recordId: ' . $recordId);
+        $message = Message::where('maillog_id', $recordId)->first(); // Use first() instead of get() to get a single record
+        if ($message) {
+            Log::info('Maillog onUpdate found message with id: ' . $message->id);
+            $this->vars['message_id'] = $message->id; // Pass the message_id to the view
+        } else {
+            $this->vars['message_id'] = null; // Handle the case where no message is found
+        }
+        return $this->asExtension('FormController')->update($recordId);
     }
   
 }

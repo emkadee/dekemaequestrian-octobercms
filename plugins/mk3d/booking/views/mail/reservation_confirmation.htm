@@ -1,20 +1,11 @@
 layout = "mk3d.booking::mail.booking_layout"
 ==
-<style type="text/css" media="screen">
-       .reservation-table {
-           width: 100%;
-           border-collapse: collapse;
-           font-size: 11px;
-       }
-       tr.reservation{
-           background-color: #f9f9f9;
-       }
-    </style>
+
 
 
 <p>Beste {{ name }},</p>
 <p>Bedankt voor je reservering. Hieronder vind je de details:</p>
-<table class="reservation-table">
+<table>
     <tr>
         <th align="left">Datum / tijd</th>
         <th align="left">Locatie</th>
@@ -22,23 +13,21 @@ layout = "mk3d.booking::mail.booking_layout"
         <th align="left">Annuleren</th>
     </tr>
     {% for reservation in reservation_details %}
-    <tr class="reservation">
+    <tr>
         {% if reservation.date == reservation.end_date %}
-            <td align="left">{{ reservation.date|date("Y m d") }} van {{ reservation.time|date("H:i") }} tot {{ reservation.end_time|date("H:i") }} uur</td>
+            <td align="left">{{ reservation.date|dutchDate("%A %e %B %Y") }} <br /> {{ reservation.time|date("H:i") }} tot {{ reservation.end_time|date("H:i") }} uur</td>
         {% else %}
-            <td align="left">{{ reservation.date|date("Y m d") }} om {{ reservation.time|date("H:i") }} tot {{ reservation.end_date|date('l j F Y', 'Europe/Amsterdam') }} om {{ reservation.end_time|date("H:i") }} uur</td>
+            <td align="left">{{ reservation.date|date("U")|date("l d F Y") }} om {{ reservation.time|date("H:i") }} tot <br />{{ reservation.end_date|date('l j F Y', 'Europe/Amsterdam') }} om {{ reservation.end_time|date("H:i") }} uur</td>
         {% endif %}
         <td align="left">{{ reservation.location }}</td>
         <td align="left">{{ reservation.status_message }}</td>
-        <td align="left"><strong><a href="{{ reservation.cancellation_link }}">Annuleren</a></td>
+        <td align="left"><a href="{{ reservation.cancellation_link }}">Annuleren</a></td>
     </tr>
     <tr>
         <td align="left" colspan="4"> 
             {% for message in reservation.messages %}
                 {{ message }}<br />
             {% endfor %}
-            <br />
-            <br />
         </td>
     </tr>
     {% else %}
@@ -49,4 +38,6 @@ layout = "mk3d.booking::mail.booking_layout"
     </tr>
     {% endfor %}
 </table>
-<p>Als je vragen hebt of wijzigingen wilt aanbrengen in je reservering, neem dan contact met ons op.</p>
+<p>Heb je nog vragen of wil je een reservering wijzigen? Neem dan contact met ons op, wij helpen je graag verder.</p>
+<br />
+

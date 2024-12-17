@@ -7,6 +7,7 @@ use Validator;
 use Redirect;
 use ValidationException;
 use Session;
+use Log;
 
 
 /**
@@ -20,26 +21,34 @@ class FormSnippet extends ComponentBase
     {
         return [
             'name' => 'Form Snippet Component',
-            'description' => 'No description provided yet...'
+            'description' => 'Create a contactform..'
         ];
     }
 
     public function defineProperties()
     {
-        return [];
+        return [
+            'subject' => [
+                'title' => 'Subject',
+                'description' => 'The subject of the message',
+                'default' => '',
+                'type' => 'string',
+            ],	
+        ];
     }
 
 
-    public function onRun() {
+    public function onRun() {   
 
-
+        $this->page['subject'] = $this->property('subject');
+        
     }
     
 
     public function onSubmit() {
         // Validate the form data
         $data = post();
-        
+
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',

@@ -46,7 +46,7 @@ class Messages extends Controller
     public static function getStatusOptions()
     {
         $statusOptions = Message::getStatusOptions();        
-        return ['0' => 'All'] + $statusOptions;        
+        return $statusOptions + ['0' => 'All'];        
     }
 
     public static function applyStatusFilter($query, $scope)
@@ -128,7 +128,7 @@ class Messages extends Controller
             }); */
 
             // Use the Mail facade to send the email
-            $this->sendReservationConfirmationEmail(
+            $this->sendReplyEmail(
                 $name,
                 $email, 
                 $mailSubject, 
@@ -140,7 +140,7 @@ class Messages extends Controller
 
                 Log::info ('Maillog not found, add content to maillog with id ' . $maillog_id);
 
-                $mailContentComplete = $maillog->message . '<hr>' . 'Reply send on : <b>' . date('Y-m-d H:i:s') . '</b>' . '<hr><br />' . $mailContent;
+                $mailContentComplete = $maillog->message . '<hr>' . '> Reply send on : <b>' . date('Y-m-d H:i:s') . '</b>' . '<hr>' . $mailContent;
                 $maillog->message = $mailContentComplete;
                 $maillog->save();
 
@@ -151,14 +151,14 @@ class Messages extends Controller
                 $maillog->receiver = $name;
                 $maillog->receiver_email = $email;
                 $maillog->subject = $mailSubject;
-                $maillog->message = '<hr>' . 'Reply send on : <b>' . date('Y-m-d H:i:s') . '</b>' . '<hr><br />' . $mailContent;
-                $maillog->save();
+                $maillog->message = '<hr>' . '> Reply send on : <b>' . date('Y-m-d H:i:s') . '</b>' . '<hr>' . $mailContent;
 
-                $maillog_id = $maillog->id;
-                Log::info ('Maillog not found, created a new one with id ' . $maillog_id);
+                $maillog->save();
+                
+                Log::info ('Maillog not found, created a new one with id ' . $maillog->id);
             }            
 
-            $message->maillog_id = $maillog_id;
+            $message->maillog_id = $maillog->id;
             $message->status = 'replied';
             $message->save(); 
 
@@ -201,7 +201,7 @@ class Messages extends Controller
 
     // *** MAIL SENDING METHODS *** //
     //SEND RESERVATION CONFIRMATION EMAIL
-    protected function sendReservationConfirmationEmail($name, $email, $mailSubject, $mailContent)
+    protected function sendReplyEmailBackup($name, $email, $mailSubject, $mailContent)
     {
         // Ensure the content is not null
         if ($mailContent !== null) {
@@ -225,10 +225,62 @@ class Messages extends Controller
         }
     }
 
+    //SEND RESERVATION CONFIRMATION EMAIL
+    protected function sendReplyEmail($name, $email, $mailSubject, $mailContent)
+    {
+        // Ensure the content is not null
+        if ($mailContent !== null) {
+
+            // Ensure proper Markdown structure
+            $mailContent = $this->ensureProperMarkdownStructure($mailContent);
+
+            // Parse the Markdown content to HTML
+            $htmlContent = new Markdown();           
+            $htmlContent = Markdown::parse($mailContent);
+
+            Log::info('Parsed HTML Content:', ['html' => $htmlContent]);
+
+            // Send the email (assuming you have a mail template set up)
+            Mail::send('mk3d.contactform::mail.reply', [
+                'subject' => $mailSubject,
+                'name' => $name,
+                'content' => $htmlContent,
+                'email' => $email,
+            ],             
+            function($message) use ($email, $name, $mailSubject) {
+                $message->to($email, $name);
+                $message->subject($mailSubject);
+            });
+
+
+        } else {
+            // Log an error if content is null
+            error_log('Email content is null.');
+        }
+    }
+
     private function ensureProperMarkdownStructure($content)
     {
         // Ensure each HTML node is on its own line
         return preg_replace('/>(\s*)</', ">\n<", $content);
     }     
+
+    protected function sendReservationretertreConfirmationEmail($email, $name, $mailSubject, $reservationDetails)
+    {
+        // Debugging: Log the data to ensure it's correct
+        Log::info('Reservation details: ' . json_encode($reservationDetails));
+
+        // Send the email (assuming you have a mail template set up)
+        Mail::send('mk3d.contactform::mail.reply', [
+            'name' => $name, 
+            'reservation_details' => $reservationDetails
+        ], 
+        
+        function($message) use ($email, $name, $mailSubject) {
+            $message->to($email, $name);
+            $message->subject($mailSubject);
+        });
+
+    }
 
 }

@@ -8,6 +8,7 @@ use Twig\TwigFilter;
 use IntlDateFormatter;
 use Event;
 use Log;
+use Carbon\Carbon;
 
 
 /**
@@ -47,6 +48,21 @@ class Plugin extends PluginBase
     public function register()
     {
         //
+    }
+    public function registerMarkupTags()
+    {
+        return [
+            'filters' => [
+                'dutchDate' => function ($date_time, $format) {
+                    $carbon = new Carbon($date_time);
+                    setlocale(LC_ALL, 'nl_NL');
+
+                    // Format the date and capitalize the first letter
+                    $formattedDate = utf8_encode($carbon->formatLocalized($format));
+                    return ucfirst($formattedDate);
+                },
+            ],
+        ];
     }
 
 

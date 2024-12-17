@@ -7,6 +7,12 @@
     <div class="col-md-10"><?= $formModel->created_at ?></div>
 </div>
 <div class="row mb-3">
+    <div class="col-md-2">Related Message</div>
+    <div class="col-md-10">
+        <a href="<?= Backend::url('mk3d/contactform/messages/update/' . $message_id) ?>">View Related Message</a>
+    </div>
+</div>
+<div class="row mb-3">
     <div class="col-md-2">Message</div>
     <div class="col-md-10">
         <div class="pb-3">

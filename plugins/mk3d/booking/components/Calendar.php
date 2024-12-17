@@ -8,9 +8,10 @@ use Log;
 use Input;
 use Validator;
 use ValidationException;
+use AjaxException;
 use Mail;
 use Config;
-
+use Redirect;
 
 
 class Calendar extends ComponentBase
@@ -142,6 +143,10 @@ class Calendar extends ComponentBase
         
         $formData = post();
 
+        
+
+        Log::info('Request data: ' . json_encode(post()));
+
         $rules = [
             'name'     => 'required',
             'email'    => 'required|email',
@@ -159,10 +164,10 @@ class Calendar extends ComponentBase
         $validation = Validator::make($formData, $rules);
 
         if ($validation->fails()) {
+            Log::info('Validation failed: ' . json_encode($validation->errors()));
             throw new ValidationException($validation);
-        }
+        }        
 
-        
 
         $customer_name = Input::get('name');
         $customer_email = Input::get('email');
@@ -172,7 +177,6 @@ class Calendar extends ComponentBase
         $date = Input::get('date'); // Get the date from the form data
         $endDate = Input::get('recurring_end_date');
         $interval = Input::get('recurring_interval');
-
 
         // Calculate the number of reservations
         $startDate = new \DateTime($date);
@@ -184,15 +188,12 @@ class Calendar extends ComponentBase
             $weeksDiff = $startDate->diff($endDate)->days / 7;
             $recurringCount = (int)floor($weeksDiff / $interval) + 1;
         }
-
     
         $startTime = strtotime($time);
         $endTime = strtotime('+' . ($duration * 60) . ' minutes', $startTime);
 
         // Create an empty array to store all reservation dates for the email
-        $reservationDates = [];
-
-       
+        $reservationDates = [];      
 
         // Generate a unique recurring group ID if not provided
         $recurringGroupId = $formData['recurring_group_id'] ?? uniqid('recurring_', true);
@@ -212,57 +213,53 @@ class Calendar extends ComponentBase
                     $startTimePlusOneMinute = strtotime('+1 minute', $startTime);
                     $endTimeMinusOneMinute = strtotime('-1 minute', $endTime);
 
-                    $query->whereBetween('reservation_start_time', [date('Y-m-d H:i', $startTime), date('Y-m-d H:i', $endTimeMinusOneMinute)])
-                        ->orWhereBetween('reservation_end_time', [date('Y-m-d H:i', $startTimePlusOneMinute), date('Y-m-d H:i', $endTime)])
+                    $query->whereBetween('reservation_start_time', [date('Y-m-d H:i', $startTimePlusOneMinute), date('Y-m-d H:i', $endTimeMinusOneMinute)])
+                        ->orWhereBetween('reservation_end_time', [date('Y-m-d H:i', $startTimePlusOneMinute), date('Y-m-d H:i', $endTimeMinusOneMinute)])
                         ->orWhere(function($query) use ($startTime, $endTime) {
                             $query->where('reservation_start_time', '<', date('Y-m-d H:i', $startTime))
                                 ->where('reservation_end_time', '>', date('Y-m-d H:i', $endTime));
                         });
-                })
-                ->exists();
+            })
+            ->exists();
 
             if ($overlappingReservations) {
-                \Flash::error('The selected timeslot is already reserved. Please choose a different timeslot.');
-                return;
-            }
+                Log::info('Overlapping reservation found');
+                throw new ValidationException(['error' => 'Er is al een reservering in dit tijdslot.']);
+            } else {
 
+                $reservation = new Reservation();
+                $reservation->customer_name = $formData['name'];
+                $reservation->customer_email = $formData['email'];
+                $reservation->location_id = $formData['location_id'];
+                $reservation->location = Location::find($formData['location_id']);
+                $reservation->reservation_start_date = $reservationDate->format('Y-m-d');
+                $reservation->reservation_end_date = $reservationDate->format('Y-m-d');
+                $reservation->reservation_start_time = date('H:i', $startTime);
+                $reservation->reservation_end_time = date('H:i', $endTime);
+                $reservation->recurring_group_id = $recurringGroupId; // Set the recurring group ID
+                $reservation->cancellation_token = uniqid('cancel_', true);   // Set the cancellation token
+                $reservation->status = 'Pending';
+                $reservation->save();
 
-            $reservation = new Reservation();
-            $reservation->customer_name = $formData['name'];
-            $reservation->customer_email = $formData['email'];
-            $reservation->location_id = $formData['location_id'];
-            $reservation->location = Location::find($formData['location_id']);
-            $reservation->reservation_start_date = $reservationDate->format('Y-m-d');
-            $reservation->reservation_end_date = $reservationDate->format('Y-m-d');
-            $reservation->reservation_start_time = date('H:i', $startTime);
-            $reservation->reservation_end_time = date('H:i', $endTime);
-            $reservation->recurring_group_id = $recurringGroupId; // Set the recurring group ID
-            $reservation->cancellation_token = uniqid('cancel_', true);   // Set the cancellation token
-            $reservation->status = 'Pending';
-            $reservation->save();
-
-             //Set the messages for each reservation for the update email
-            $messages = [];
-            array_push($messages, 'Je krijgt nog een bevestiging van deze reservering als deze akkoord is.');
-            
-            $statusMessage = 'In aanvraag';
- 
-            
-            Log::info('messages: ' . print_r($messages, true));
-            
-            
-            $location = Location::find($formData['location_id']);
-            $locationName = $location->name;  
-            // Add the reservation date to the list for the email
-            $reservationDetails[] = [
-                'date' => $reservationDate->format('Y-m-d'),
-                'time' => date('H:i', $startTime),
-                'end_time' => date('H:i', $endTime),
-                'location' => $locationName,
-                'messages' => $messages,
-                'status_message' => $statusMessage,
-                'cancellation_link' => url('/cancellation/' . $reservation->cancellation_token), // Include the cancellation token
-            ];
+                //Set the messages for each reservation for the update email
+                $messages = [];
+                array_push($messages, 'Je krijgt nog een bevestiging van deze reservering als deze akkoord is.');                
+                $statusMessage = 'In aanvraag';
+                
+                
+                $location = Location::find($formData['location_id']);
+                $locationName = $location->name;  
+                // Add the reservation date to the list for the email
+                $reservationDetails[] = [
+                    'date' => $reservationDate->format('Y-m-d'),
+                    'time' => date('H:i', $startTime),
+                    'end_time' => date('H:i', $endTime),
+                    'location' => $locationName,
+                    'messages' => $messages,
+                    'status_message' => $statusMessage,
+                    'cancellation_link' => url('/cancellation/' . $reservation->cancellation_token), // Include the cancellation token
+                ];
+            }            
         }
         
         
@@ -270,8 +267,13 @@ class Calendar extends ComponentBase
         $mailSubject = 'Update van jouw reservering';        
         $this->sendReservationConfirmationEmail($formData['email'], $formData['name'], $mailSubject, $reservationDetails);
         
-        \Flash::success('Reservation successfully made!');
-        return \Redirect::to('/calendar/' . $formData['location_id'] . '?date=' . $formData['date']);
+        Log::info('No overlapping reservation found');
+        // Proceed with reservation logic if no overlap
+        // Return a success response
+        return ['success' => true];
+
+       /*  return \Redirect::to('/calendar/' . $formData['location_id'] . '?date=' . $formData['date']); */
+    
     }
 
 /*     //SEND RESERVATION CONFIRMATION EMAIL

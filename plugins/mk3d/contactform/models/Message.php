@@ -31,8 +31,7 @@ class Message extends Model
     {
         return [
             'new' => 'New',
-            'replied' => 'Replied',
-            'read' => 'Read'
+            'replied' => 'Replied'
         ];
     }
 
@@ -48,7 +47,7 @@ class Message extends Model
     public static function getStatusOptions()
     {
         $statusOptions = self::getStatusLabels();
-        return ['0' => 'All'] + $statusOptions;
+        return $statusOptions;
     }
 
 

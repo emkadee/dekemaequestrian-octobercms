@@ -31,6 +31,17 @@ class Plugin extends PluginBase
         //
     }
 
+    public function registerMailTemplates()
+    {
+        return [
+            'mk3d.contactform::mail.reply' => 'reply',
+
+        ];
+    }
+
+
+
+
     /**
      * boot method, called right before the request route.
      */
@@ -46,14 +57,14 @@ class Plugin extends PluginBase
     {
 
         return [
-            'Mk3d\ContactForm\Components\FormSnippet' => 'myForm',
+            'Mk3d\ContactForm\Components\FormSnippet' => 'formSnippet',
         ];
     }
 
     public function registerPageSnippets()
     {
         return [
-            'Mk3d\ContactForm\Components\FormSnippet' => 'myForm',
+            'Mk3d\ContactForm\Components\FormSnippet' => 'formSnippet',
         ];
     }
 

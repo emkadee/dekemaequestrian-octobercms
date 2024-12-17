@@ -408,8 +408,12 @@ class Reservations extends Controller
             return Redirect::back();
         }
 
-        // Retrieve all recurring reservations
-        $reservations = Reservation::where('recurring_group_id', $recurringGroupId)->get();
+        // Retrieve all recurring reservations in the future
+        $now = Carbon::now();
+        $reservations = Reservation::where('recurring_group_id', $recurringGroupId)
+            ->where('reservation_start_date', '>=', $now)
+            ->get();
+
         Log::info('onSaveForRecurring: found ' . $reservations->count() . ' recurring reservations.');
 
         // Update all recurring reservations

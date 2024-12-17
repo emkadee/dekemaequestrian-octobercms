@@ -3,9 +3,7 @@ $(document).ready(function() {
     // Initialize reservation form modal
     initializeReservationForm();
     });
-$(function() {
-    $("#reservation_date").datepicker($.datepicker.regional["nl"]);
-});
+    
 </script>
 
 
@@ -104,9 +102,11 @@ $(function() {
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
+                
             </div>
             <div class="modal-body">
-                <form data-request="onSubmitReservation">
+                <form data-request="onSubmitReservation" data-request-success="handleSuccess(data)" data-request-error="handleError">
+                    <div id="error-message" class="alert alert-danger" style="display: none;"></div>
                     <input type="hidden" name="time" id="modal-time">
                     <input type="hidden" name="location_id" id="modal-location">
                     <input type="hidden" name="date" id="modal-date">
@@ -155,6 +155,33 @@ $(function() {
 </div>
 
 <script>
+
+   function handleSuccess(data) {
+        // Hide the error message if the request is successful
+        document.getElementById('error-message').style.display = 'none';
+    }
+
+    function handleError(jqXHR) {
+        console.log('Error status:', status);
+        console.log('Error details:', error);
+        console.log('Full error object:', jqXHR);
+
+        // Display the error message if the request fails
+        var errorMessage = document.getElementById('error-message');
+        console.log('Error response:', jqXHR);
+        if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
+            errorMessage.innerHTML = jqXHR.responseJSON.error;
+        } else if (jqXHR.responseJSON && jqXHR.responseJSON.errors) {
+            var errors = jqXHR.responseJSON.errors;
+            var errorMessages = Object.values(errors).join('<br>');
+            errorMessage.innerHTML = errorMessages;
+        } else {
+            errorMessage.innerHTML = 'Er is een fout opgetreden. Probeer het opnieuw.';
+            console.error('Unexpected error response:', jqXHR);
+        }
+        errorMessage.style.display = 'block';
+    }
+
     function initializeReservationForm() {
         $('.open-reservation-form').on('click', function(e) {
             e.preventDefault();
