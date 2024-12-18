@@ -12,7 +12,8 @@ use AjaxException;
 use Mail;
 use Config;
 use Redirect;
-
+use Flash;
+use Carbon\Carbon;
 
 class Calendar extends ComponentBase
 {
@@ -141,9 +142,7 @@ class Calendar extends ComponentBase
 
     public function onSubmitReservation() {      
         
-        $formData = post();
-
-        
+        $formData = post();        
 
         Log::info('Request data: ' . json_encode(post()));
 
@@ -178,6 +177,15 @@ class Calendar extends ComponentBase
         $endDate = Input::get('recurring_end_date');
         $interval = Input::get('recurring_interval');
 
+        $location = Location::find($location_id);
+        $openingTime = strtotime($location->opening_time);
+        $closingTime = strtotime($location->closing_time);
+        $locationName = $location->name;
+        // Adjust closing time if it is 00:00:00 to be the next day
+        if (date('H:i:s', $closingTime) == '00:00:00') {
+            $closingTime = strtotime('+1 day', $closingTime);
+        }
+
         // Calculate the number of reservations
         $startDate = new \DateTime($date);
         $endDate = isset($endDate) ? new \DateTime($endDate) : null;
@@ -192,40 +200,112 @@ class Calendar extends ComponentBase
         $startTime = strtotime($time);
         $endTime = strtotime('+' . ($duration * 60) . ' minutes', $startTime);
 
+        // Check if the reservation end time is after the closing time
+        if ($endTime > $closingTime) {
+            throw new AjaxException('De ' . strtolower($locationName) . ' sluit om ' . date('H:i', $closingTime) . '. Kies een eerdere tijd.');
+        }
+
         // Create an empty array to store all reservation dates for the email
         $reservationDates = [];      
 
         // Generate a unique recurring group ID if not provided
         $recurringGroupId = $formData['recurring_group_id'] ?? uniqid('recurring_', true);
 
-        // Create reservations
+        $message = "";
+        $overlappingReservations = [];
+
+        // Check for overlapping reservations
         for ($i = 0; $i < $recurringCount; $i++) {
             $reservationDate = clone $startDate;
             $reservationDate->modify("+" . ($i * $interval) . " weeks");
 
-            $startTime = strtotime($reservationDate->format('Y-m-d') . ' ' . $time);
-            $endTime = $startTime + ($formData['duration'] * 3600);      
+            /* $startTime = strtotime($reservationDate->format('Y-m-d') . ' ' . $time); */
+            $endTime = $startTime + ($formData['duration'] * 3600);   
+            
+            Log::info('Start Time: ' . $startTime);
+            Log::info('End Time: ' . $endTime);
             
             // Check for overlapping reservations
-            $overlappingReservations = Reservation::where('location_id', $formData['location_id'])
-                ->whereDate('reservation_start_date', $reservationDate) // Ensure the date is considered
-                ->where(function($query) use ($startTime, $endTime) {
-                    $startTimePlusOneMinute = strtotime('+1 minute', $startTime);
-                    $endTimeMinusOneMinute = strtotime('-1 minute', $endTime);
+           /*  $overlappingReservation = Reservation::where('location_id', $formData['location_id'])
+            ->whereDate('reservation_start_date', $reservationDate) // Ensure the date is considered
+            ->where(function($query) use ($startTime, $endTime) {
+                $startTimePlusOneMinute = date('H:i', strtotime('+1 minute', $startTime));
+                $endTimeMinusOneMinute = date('H:i', strtotime('-1 minute', $endTime));
+                
+                
+                $query->where(function($query) use ($startTimePlusOneMinute, $endTimeMinusOneMinute) {
+                    //New       20:00 - 21:00
+                    //Existing  20:30 - 21:30
+                    //21:01 > 20:30 = true
+                    //21:30 < 21:01 = true
 
-                    $query->whereBetween('reservation_start_time', [date('Y-m-d H:i', $startTimePlusOneMinute), date('Y-m-d H:i', $endTimeMinusOneMinute)])
-                        ->orWhereBetween('reservation_end_time', [date('Y-m-d H:i', $startTimePlusOneMinute), date('Y-m-d H:i', $endTimeMinusOneMinute)])
-                        ->orWhere(function($query) use ($startTime, $endTime) {
-                            $query->where('reservation_start_time', '<', date('Y-m-d H:i', $startTime))
-                                ->where('reservation_end_time', '>', date('Y-m-d H:i', $endTime));
-                        });
+                    //New       22:30 - 23:30
+                    //Existing  23:00 - 0:00
+
+
+                    $query->where('reservation_start_time', '>', $startTimePlusOneMinute)
+                          ->where('reservation_end_time', '>', $endTimeMinusOneMinute);
+    
+                });
             })
-            ->exists();
+            ->get();  */
 
-            if ($overlappingReservations) {
-                Log::info('Overlapping reservation found');
-                throw new ValidationException(['error' => 'Er is al een reservering in dit tijdslot.']);
-            } else {
+            $overlappingReservation = Reservation::where('location_id', $formData['location_id'])
+            ->whereDate('reservation_start_date', $reservationDate) // Ensure the date is considered
+            ->where(function($query) use ($startTime, $endTime) {
+                $startTimePlusOneMinute = date('H:i:s', strtotime('+1 minute', $startTime));
+                $endTimeMinusOneMinute = date('H:i:s', strtotime('-1 minute', $endTime));
+        
+                $query->where(function($query) use ($startTime, $endTime, $startTimePlusOneMinute, $endTimeMinusOneMinute) {
+                    $query->where(function($query) use ($startTime, $endTime) {
+                        $query->where('reservation_start_time', '<', date('H:i:s', $endTime))
+                              ->where('reservation_end_time', '>', date('H:i:s', $startTime));
+                    })
+                    ->orWhere(function($query) use ($startTime, $endTime) {
+                        $query->where('reservation_start_time', '<', date('H:i:s', $endTime))
+                              ->where('reservation_end_time', '>', date('H:i:s', $startTime));
+                    })
+                    ->orWhere(function($query) use ($startTime, $endTime) {
+                        $query->where('reservation_start_time', '>=', date('H:i:s', $startTime))
+                              ->where('reservation_end_time', '<=', date('H:i:s', $endTime));
+                    });
+                });
+            })
+            ->get();
+
+            if ($overlappingReservation->count() > 0) {
+                Log::info('Overlapping reservation found : ' . json_encode($overlappingReservation));
+                array_push($overlappingReservations, $overlappingReservation);
+            }
+ 
+        }
+            
+        Log::info('Overlapping reservations found : ' . json_encode($overlappingReservations));
+
+        if (count($overlappingReservations) > 0) {
+            
+            foreach ($overlappingReservations as $overlappingReservationGroup) {
+                foreach ($overlappingReservationGroup as $overlappingReservation) {
+                    $startDate = $this->dutchDate($overlappingReservation['reservation_start_date'], 'l d F Y');
+
+
+                    $startTime = date('H:i', strtotime($overlappingReservation['reservation_start_time']));
+                    $endTime = date('H:i', strtotime($overlappingReservation['reservation_end_time']));
+
+                    $message .= 'De '. strtolower($locationName) .' is op ' . $startDate . ' van ' . $startTime . ' tot ' . $endTime . ' al bezet<br />';
+                }
+            }
+            Log::info('Overlapping reservation found');
+            throw new AjaxException($message);
+        
+        } else {
+            // Check for overlapping reservations
+            for ($i = 0; $i < $recurringCount; $i++) {
+                $reservationDate = clone $startDate;
+                $reservationDate->modify("+" . ($i * $interval) . " weeks");
+
+                $startTime = strtotime($reservationDate->format('Y-m-d') . ' ' . $time);
+                $endTime = $startTime + ($formData['duration'] * 3600); 
 
                 $reservation = new Reservation();
                 $reservation->customer_name = $formData['name'];
@@ -270,9 +350,9 @@ class Calendar extends ComponentBase
         Log::info('No overlapping reservation found');
         // Proceed with reservation logic if no overlap
         // Return a success response
-        return ['success' => true];
 
-       /*  return \Redirect::to('/calendar/' . $formData['location_id'] . '?date=' . $formData['date']); */
+        Flash::success('Jouw resevering is geplaatst. Je hebt een bevestiging per mail ontvangen.');
+        return \Redirect::to('/calendar/' . $formData['location_id'] . '?date=' . $formData['date']);
     
     }
 
@@ -305,6 +385,16 @@ class Calendar extends ComponentBase
 
     }
 
+    public function dutchDate($date_time, $format)
+    {
+        $carbon = new Carbon($date_time);
+        $carbon->locale('nl_NL');
+
+        // Format the date using Carbon's localization
+        $formattedDate = $carbon->translatedFormat($format);
+        return $formattedDate;
+    }
+
 
 
 
@@ -321,7 +411,6 @@ class Calendar extends ComponentBase
         $locationSelected = Location::find($locationId);
 
         if($locationSelected->public_available == false){
-            Log::error('Location not available for online reservation.');
             return [];
         }
 
@@ -343,9 +432,6 @@ class Calendar extends ComponentBase
         if (date('H:i:s', $closingTime) == '00:00:00') {
             $closingTime = strtotime('+1 day', $closingTime);
         }
-
-        Log::info('Opening Time: ' . $locationSelected->opening_time . ' (' . $openingTime . ')');
-        Log::info('Closing Time: ' . $locationSelected->closing_time . ' (' . $closingTime . ')');
 
         // Get the current date and time
         $now = new \DateTime();
@@ -387,27 +473,25 @@ class Calendar extends ComponentBase
     public function matchReservationsWithTimeSlots($date = null, $locationId = null)
     {
         $reservations = $this->reservations($date, $locationId);
-        $matchReservationsWithTimeSlots = $this->generateTimeSlots($date,);
+        $matchReservationsWithTimeSlots = $this->generateTimeSlots($date);
 
         foreach ($matchReservationsWithTimeSlots as $period => &$slots) {
             foreach ($slots as &$slot) {
                 $slotStartTime = strtotime($slot['time']);
                 $slotEndTime = strtotime('+30 minutes', $slotStartTime);
 
-                Log::info('Checking Slot: '. $date . ' - ' . $slot['time'] . ' (' . $slotStartTime . ' - ' . $slotEndTime . ')');
-
                 foreach ($reservations as $reservation) {
                     $reservationStartTime = strtotime($reservation->reservation_start_time);
                     $reservationEndTime = strtotime($reservation->reservation_end_time);
 
-                    
-
-                    Log::info('Reservation: ' . $reservation->reservation_start_time . ' (' . $reservationStartTime . ') - ' . $reservation->reservation_end_time . ' (' . $reservationEndTime . ')');
+                    // Adjust reservation end time if it spans into the next day
+                    if ($reservationEndTime <= $reservationStartTime) {
+                        $reservationEndTime = strtotime('+1 day', $reservationEndTime);
+                    }
 
                     // Check if the reservation overlaps with the time slot
                     if ($reservationStartTime < $slotEndTime && $reservationEndTime > $slotStartTime) {
                         $slot['reserved'] = true;
-                        Log::info('Slot ' . $slot['time'] . ' is reserved.');
                         break;
                     }
                 }

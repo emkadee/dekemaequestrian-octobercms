@@ -94,7 +94,7 @@ $(document).ready(function() {
 </div>
 
 <!-- Modal -->
-<div class="modal fade modal-custom" id="reservationModal" tabindex="-1" role="dialog" aria-labelledby="reservationModalLabel" aria-hidden="true">
+<div class="modal fade modal-custom" id="reservationModal" tabindex="-1" role="dialog" aria-labelledby="reservationModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -105,7 +105,7 @@ $(document).ready(function() {
                 
             </div>
             <div class="modal-body">
-                <form data-request="onSubmitReservation" data-request-success="handleSuccess(data)" data-request-error="handleError">
+                <form data-request="onSubmitReservation" data-request-success="handleSuccess(data)" data-request-error="handleError(data)">
                     <div id="error-message" class="alert alert-danger" style="display: none;"></div>
                     <input type="hidden" name="time" id="modal-time">
                     <input type="hidden" name="location_id" id="modal-location">
@@ -161,25 +161,12 @@ $(document).ready(function() {
         document.getElementById('error-message').style.display = 'none';
     }
 
-    function handleError(jqXHR) {
-        console.log('Error status:', status);
-        console.log('Error details:', error);
-        console.log('Full error object:', jqXHR);
+    function handleError(data) {
+        // Show the error message if the request fails
+        const errorMessage = data.result;   
+        document.getElementById('error-message').innerHTML = errorMessage; 
+        document.getElementById('error-message').style.display = 'block';
 
-        // Display the error message if the request fails
-        var errorMessage = document.getElementById('error-message');
-        console.log('Error response:', jqXHR);
-        if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
-            errorMessage.innerHTML = jqXHR.responseJSON.error;
-        } else if (jqXHR.responseJSON && jqXHR.responseJSON.errors) {
-            var errors = jqXHR.responseJSON.errors;
-            var errorMessages = Object.values(errors).join('<br>');
-            errorMessage.innerHTML = errorMessages;
-        } else {
-            errorMessage.innerHTML = 'Er is een fout opgetreden. Probeer het opnieuw.';
-            console.error('Unexpected error response:', jqXHR);
-        }
-        errorMessage.style.display = 'block';
     }
 
     function initializeReservationForm() {
@@ -192,6 +179,10 @@ $(document).ready(function() {
             $('#modal-location').val(location);
             $('#modal-date').val(date);
             $('#reservationModal').modal('show');
+        });
+        // Hide the error_message div when the modal is closed
+        $('#reservationModal').on('hidden.bs.modal', function () {
+            document.getElementById('error-message').style.display = 'none';
         });
     }
 

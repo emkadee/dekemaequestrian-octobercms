@@ -54,29 +54,31 @@
                     <i class="icon-trash"></i>
                     <?= __("Delete Reservation") ?>
                 </button>
-                <span class="btn-text">
-                    <span class="button-separator"><?= __("or") ?></span>
-                </span>
-
-                <button
-                    type="submit"
-                    class="btn btn-primary"
-                    data-request="onSaveForRecurring"
-                    ata-request-message="<?= __("Change recurring...") ?>"
-                    data-request-confirm="<?= __("Are you sure you want to save changes for all recurring reservations? This will change the Customer Name, Customer Email, Status, Location and the Starttime & Endtime for all recurring reservations.") ?>">
-                    <i class="icon-save"></i>
-                    <?= __("Save for all recurring reservations") ?>
-                </button>
-                <button
-                    type="button"
-                    class="btn btn-danger"
-                    data-request="onDeleteRecurring"
-                    data-request-data="recurring_group_id: '<?= $recurringGroupId ?>'"
-                    data-confirm="Are you sure you want to delete all recurring reservations?"
-                    data-request-message="<?= __("Deleting...") ?>"
-                    data-request-confirm="<?= __("Are you sure?") ?>">
-                    Delete Recurring
-                </button>
+                <?php if ($hasRecurringReservations): ?>
+                    <span class="btn-text">
+                        <span class="button-separator"><?= __("or") ?></span>
+                    </span>
+                    
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                        data-request="onSaveForRecurring"
+                        ata-request-message="<?= __("Change recurring...") ?>"
+                        data-request-confirm="<?= __("Are you sure you want to save changes for all recurring reservations? This will change the Customer Name, Customer Email, Status, Location and the Starttime & Endtime for all recurring reservations.") ?>">
+                        <i class="icon-save"></i>
+                        <?= __("Save for all recurring reservations") ?>
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-danger"
+                        data-request="onDeleteRecurring"
+                        data-request-data="recurring_group_id: '<?= $recurringGroupId ?>'"
+                        data-confirm="Are you sure you want to delete all recurring reservations?"
+                        data-request-message="<?= __("Deleting...") ?>"
+                        data-request-confirm="<?= __("Are you sure?") ?>">
+                        Delete Recurring
+                    </button>
+                <?php endif; ?>
                 <span class="btn-text">
                     <span class="button-separator"><?= __("or") ?></span>
                     <a

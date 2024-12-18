@@ -98,15 +98,57 @@ class Reservations extends Controller
     public function formExtendFields($form)
     {
         Log::info('formExtendFields called' .$form->model->id);
-        $form->addFields([
-            'recurring_reservations' => [
-                'label' => '',
-                'type' => 'partial',
-                'path' => '$/mk3d/booking/controllers/reservations/_recurring_reservations.php',
-                'span' => 'full',
-                'context' => ['update'],
-            ],
-        ]);
+
+        $reservationId = $form->model->id;
+
+        // Retrieve the reservation with the given ID
+        $reservation = Reservation::find($reservationId);
+
+        if ($reservation) {
+            // Retrieve the recurring group ID of the reservation
+            $recurringGroupId = $reservation->recurring_group_id;
+
+            // Check if there are other reservations with the same recurring group ID
+            $recurringReservations = Reservation::where('recurring_group_id', $recurringGroupId)
+                ->where('id', '!=', $reservationId) // Exclude the current reservation
+                ->get();
+
+            // Format the date and time fields for logging
+/*             foreach ($recurringReservations as $recurringReservation) {
+                $formattedRecurringReservations[] = [
+                    'reservation_start_date' => $recurringReservation->reservation_start_date|date('Y-m-d'),
+                    'reservation_start_time' => $recurringReservation->reservation_start_time,
+                    'reservation_end_time' => $recurringReservation->reservation_end_time,
+                ];
+            } */
+
+                        
+
+            if ($recurringReservations->isNotEmpty()) {
+                // There are recurring reservations
+                $form->addFields([
+                    'recurring_reservations' => [
+                        'label' => '',
+                        'type' => 'partial',
+                        'path' => '$/mk3d/booking/controllers/reservations/_recurring_reservations.php',
+                        'span' => 'full',
+                        'context' => ['update'],
+                    ],
+                ]);
+                $hasRecurringReservations = true;
+            } else {
+                // No recurring reservations found
+                Log::info('No recurring reservations found for reservation ID: ' . $reservationId);
+                $hasRecurringReservations = false;
+            }
+        } else {
+            // Reservation not found
+            Log::info('Reservation not found with ID: ' . $reservationId);
+        }
+    
+        $this->vars['hasRecurringReservations'] = $hasRecurringReservations;
+        
+        
 
         // Check if the form is in create or update context
         if ($form->context == 'create') {
@@ -440,6 +482,7 @@ class Reservations extends Controller
                     'cancellation_link' => url('/cancellation/' . $recurringReservation->cancellation_token), // Include the cancellation token
 
                 ];
+                Log::info('Reservation details: ' . json_encode($reservationDetails));
             }    
         }
 

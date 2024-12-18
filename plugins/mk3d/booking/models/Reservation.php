@@ -162,6 +162,7 @@ class Reservation extends Model
             ->get();
         
         foreach ($reservations as $reservation) {
+            $reservation->reservation_start_date = $reservation->reservation_start_date;
             $reservation->reservation_start_time = (new DateTime($reservation->reservation_start_time))->format('H:i');
             $reservation->reservation_end_time = (new DateTime($reservation->reservation_end_time))->format('H:i');
         }
@@ -175,6 +176,8 @@ class Reservation extends Model
 
     public function getRecurringReservations()
     {
+
+            
         $recurringGroupId = $this->recurring_group_id;
         if (is_string($recurringGroupId)) {
             $recurringGroupId = [$recurringGroupId];
@@ -185,12 +188,13 @@ class Reservation extends Model
                         ->get();
 
         
-                        Log::info('Recurring Reservations: ' . $reservations);
-        foreach ($reservations as $reservation) {
-            $reservation->reservation_start_time = (new DateTime($reservation->reservation_start_time))->format('H:i');
-        }
+        Log::info('Recurring Reservations from model: ' . $reservations);
 
-        
+        foreach ($reservations as $reservation) {
+            $reservation->reservation_start_time = dutchDate($reservation->reservation_start_time, '%H:%M');
+            $reservation->reservation_end_time = dutchDate($reservation->reservation_end_time, '%H:%M');
+            $reservation->reservation_start_date = dutchDate($reservation->reservation_start_date, '%Y-%m-%d');
+        }       
 
         return $reservations;
 

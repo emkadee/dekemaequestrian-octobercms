@@ -1,5 +1,10 @@
 <h1>Cancel Reservation - From component </h1>
 <h6>{{ cancellation_token }}</h6>
+{% if reservation.reservation_start_date == reservation.reservation_end_date %}
+                    <h6>{{ reservation.reservation_start_date|date('l j F Y', 'Europe/Amsterdam') }} - {{ reservation.reservation_start_time|date("H:i") }} tot {{ reservation.reservation_end_time|date("H:i")  }} uur</h6>
+                {% else %}
+                    <h6>{{ reservation.reservation_start_date|date('l j F Y', 'Europe/Amsterdam') }} - {{ reservation.reservation_start_time|date("H:i") }} tot {{ reservation.reservation_end_date|date('l j F Y', 'Europe/Amsterdam') }} - {{ reservation.reservation_end_time|date("H:i")  }} uur</h6>
+                {% endif %}
 
 <form data-request="onConfirmCancelReservation">
     <input type="hidden" name="cancellation_token" value="{{ cancellation_token }}">

@@ -41,7 +41,19 @@
 <script>
     $(document).ready(function() {
         
+        // Get the input field
+        var inputField = document.getElementById('Form-field-Message-subject');
+            
+        // Get the current value of the input field
+        var currentValue = inputField.value;
         
+        // Prepend 'Re: ' to the current value
+        var newValue = 'Re: ' + currentValue;
+        
+        // Update the input field with the new value
+        inputField.value = newValue;
+
+
         // Initialize Froala Editor with specific buttons
         var editorElement = $('#Form-field-Message-reply_message');
         if (editorElement.length) {
@@ -69,11 +81,13 @@
         $('#sendEmailButton').on('click', function() {
             var messageId = $('#message_id').val(); // Get the message ID from the hidden input
             var emailContent = editorElement.froalaEditor('html.get'); // Get the content from the Froala editor
+            var emailSubject = $('#Form-field-Message-subject').val(); // Get the subject from the input field
 
             $.request('onSendEmail', {
-                data: { message_id: messageId, email_content: emailContent },
+                data: { message_id: messageId, email_content: emailContent, email_subject: emailSubject },
                 success: function(response) {
                     alert('Email sent successfully!');
+                    
                 },
                 error: function(response) {
                     alert('Failed to send email.');

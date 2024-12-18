@@ -3,6 +3,7 @@
 # ===================================
 
 fields:
+    
     message:
         label:
         type: partial
@@ -10,9 +11,13 @@ fields:
     selector:
         label: Standard reply
         type: standardreply
-        span: left
+        span: left      
+    subject:
+        label: Subject
+        type: text
+        span: left    
     reply_message:
         label: Reply message
         type: textarea
         size: huge
-        default: "test"
+    

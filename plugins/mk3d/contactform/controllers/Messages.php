@@ -74,7 +74,7 @@ class Messages extends Controller
     {
         $this->vars['replyTitles'] = Reply::pluck('title', 'id')->toArray();
         $this->vars['messageId'] = $recordId; // Pass the message ID to the view
-
+        $this->vars['replySubject'] = 'Re: ' . Message::find($recordId)->subject;
         // Call the parent update method
         return $this->asExtension('FormController')->update($recordId);
     }
@@ -103,6 +103,7 @@ class Messages extends Controller
         Log::info('onSendEmail called');
         $messageId = post('message_id');
         $mailContent = post('email_content');
+        $mailSubject = post('email_subject');
 
         $message = Message::find($messageId);
 
@@ -113,7 +114,6 @@ class Messages extends Controller
             Log::info('Message found');
             $email = $message->email;
             $name = $message->name;
-            $mailSubject = 'Re: ' . $message->subject;
 
             Log::info('Email: '.$email);
             Log::info('Name: '.$name);
@@ -162,10 +162,10 @@ class Messages extends Controller
             $message->status = 'replied';
             $message->save(); 
 
-            return Redirect::to('http://dev.dekemaequestrian.nl/adminde/mk3d/contactform/messages');
+            return Redirect::to(Backend::url('mk3d/contactform/messages'));
 
         }
-        return Redirect::to('adminde/mk3d/contactform/messages');
+        return Redirect::to(Backend::url('mk3d/contactform/messages'));
 
 
     }
