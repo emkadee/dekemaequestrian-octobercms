@@ -9,4 +9,4 @@ columns:
     message:
         label: HTML Content
         type: partial
-        path: '$/mk3d/contactform/partials/_column_html_content.htm'
+        path: "~/plugins/mk3d/contactform/controllers/messages/_column_html_content.htm"

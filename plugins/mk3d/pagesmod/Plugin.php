@@ -20,7 +20,7 @@ class Plugin extends PluginBase
     {
         return [
             'name' => 'PagesMod',
-            'description' => 'Changes the default 300px width to 100% in the placeholders from the Rainlab.Pages plugin',
+            'description' => 'MK3D - Changes the default 300px width to 100% in the placeholders from the Rainlab.Pages plugin',
             'author' => 'Mk3d',
             'icon' => 'icon-leaf'
         ];

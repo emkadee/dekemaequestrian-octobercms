@@ -6,5 +6,4 @@ fields:
     message:
         label:
         type: partial
-        path: '$/mk3d/contactform/partials/_field_html_content.htm'
-
+        path: "~/plugins/mk3d/contactform/controllers/maillogs/_field_html_content.htm"

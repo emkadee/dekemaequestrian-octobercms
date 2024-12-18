@@ -18,12 +18,9 @@ columns:
     message:
         label: Message
         type: partial
-        path: '$/mk3d/contactform/partials/_column_html_content.htm'
+        path: "~/plugins/mk3d/contactform/controllers/messages/_column_html_content.htm"
     created_at:
         label: Date
-        searchable: true
-    maillog_id:
-        label: Maillog ID
         searchable: true
     status:
         label: Status

@@ -15,7 +15,7 @@ class Plugin extends PluginBase
     {
         return [
             'name'        => 'Contentblocks',
-            'description' => 'Provides content blocks for the website.',
+            'description' => 'MK3D - Provides content blocks, buttons and image sliders as snippets.',
             'author'      => 'Mk3d',
             'icon'        => 'icon-cube'
         ];

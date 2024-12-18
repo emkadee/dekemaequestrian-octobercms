@@ -166,9 +166,6 @@ class Reservation extends Model
             $reservation->reservation_start_time = (new DateTime($reservation->reservation_start_time))->format('H:i');
             $reservation->reservation_end_time = (new DateTime($reservation->reservation_end_time))->format('H:i');
         }
-
-        Log::info('Recurring Reservations: ' . $reservations);
-
         return $reservations;    
     }
     

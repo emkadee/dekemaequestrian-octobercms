@@ -17,7 +17,7 @@ class Plugin extends PluginBase
     {
         return [
             'name' => 'ContactForm',
-            'description' => 'No description provided yet...',
+            'description' => 'MK3D - Place contactforms via snippets and manage messages and replies.',
             'author' => 'Mk3d',
             'icon' => 'icon-leaf'
         ];
@@ -68,7 +68,7 @@ class Plugin extends PluginBase
         ];
     }
 
-    public function registerFormWidgets()
+/*     public function registerFormWidgets()
     {
         return [
             'Mk3d\ContactForm\FormWidgets\StandardReply' => [
@@ -76,7 +76,7 @@ class Plugin extends PluginBase
                 'code' => 'standardreply'
             ]
         ];
-    }
+    } */
 
     /**
      * registerPermissions used by the backend.

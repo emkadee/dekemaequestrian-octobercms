@@ -3,21 +3,11 @@
 # ===================================
 
 fields:
-    
     message:
-        label:
+        label: Message
         type: partial
-        path: '$/mk3d/contactform/partials/_field_html_content_message.htm'
-    selector:
-        label: Standard reply
-        type: standardreply
-        span: left      
-    subject:
-        label: Subject
-        type: text
-        span: left    
-    reply_message:
-        label: Reply message
-        type: textarea
-        size: huge
-    
+        path: "~/plugins/mk3d/contactform/controllers/messages/_field_html_message.htm"
+    standardreply:
+        label: "Standard Reply"
+        type: partial
+        path: "~/plugins/mk3d/contactform/controllers/messages/_standardreply.htm"

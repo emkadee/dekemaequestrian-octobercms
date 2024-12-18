@@ -25,7 +25,7 @@ class Plugin extends PluginBase
     {
         return [
             'name' => 'Booking',
-            'description' => 'No description provided yet...',
+            'description' => 'MK3D - Booking plugin for reservations.',
             'author' => 'Mk3d',
             'icon' => 'icon-leaf'
         ];

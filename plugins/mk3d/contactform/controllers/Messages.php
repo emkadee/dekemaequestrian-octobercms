@@ -1,10 +1,13 @@
 <?php namespace Mk3d\ContactForm\Controllers;
 
 use BackendMenu;
+use Backend;
 use Backend\Classes\Controller;
 use Mk3d\ContactForm\Models\Reply;
 use Mk3d\ContactForm\Models\Message;
 use Mk3d\ContactForm\Models\Maillog;
+use Backend\FormWidgets\RichEditor;
+use Backend\Classes\FormField;
 use Log;
 use Mail;
 use Session;
@@ -12,6 +15,8 @@ use Markdown;
 use Carbon\Carbon;
 use Redirect;
 use Config;
+use AjaxException;
+use Flash;
 /**
  * Messages Backend Controller
  *
@@ -70,14 +75,28 @@ class Messages extends Controller
     }
 
 
-    public function update($recordId = null)
+    public function update($recordId = null, $context = null)
     {
         $this->vars['replyTitles'] = Reply::pluck('title', 'id')->toArray();
         $this->vars['messageId'] = $recordId; // Pass the message ID to the view
         $this->vars['replySubject'] = 'Re: ' . Message::find($recordId)->subject;
+
+        // Create a FormField instance for the RichEditor
+        $field = new FormField('reply_message', 'Reply message');
+        $field->value = ''; // Set the initial value if needed
+
+        // Create a RichEditor instance
+        $richEditor = new RichEditor($this, $field);
+        $richEditor->bindToController();
+
+        // Pass the RichEditor instance to the view
+        $this->vars['rich_editor'] = $richEditor;
+
         // Call the parent update method
         return $this->asExtension('FormController')->update($recordId);
+
     }
+    
 
     public function onGetReplyMessage()
     {
@@ -98,34 +117,23 @@ class Messages extends Controller
 
         return ['message' => $replyMessage];
     }
+
     public function onSendEmail()
     {
         Log::info('onSendEmail called');
-        $messageId = post('message_id');
-        $mailContent = post('email_content');
-        $mailSubject = post('email_subject');
+        $messageId = input('message_id');
+        $mailContent = input('reply_message');
+        $mailSubject = input('email_subject');
 
         $message = Message::find($messageId);
 
         Log::info('Message ID: '.$messageId);	
-        Log::info('Mail content: '.$mailContent);
+        Log::info('Mail content: '.$mailSubject);
 
         if ($message) {
             Log::info('Message found');
             $email = $message->email;
             $name = $message->name;
-
-            Log::info('Email: '.$email);
-            Log::info('Name: '.$name);
-            Log::info('Subject: '.$mailSubject);
-            Log::info('Content: '.$mailContent);
-
-
-            /* // Use the Mail facade to send the email
-            Mail::send('mk3d.contactform::mail.reply', ['content' => $mailContent], function($message) use ($email) {
-                $message->to($email);
-                $message->subject('Reply to your message');
-            }); */
 
             // Use the Mail facade to send the email
             $this->sendReplyEmail(
@@ -162,10 +170,18 @@ class Messages extends Controller
             $message->status = 'replied';
             $message->save(); 
 
+
+            // Return a JSON response with the redirect URL
+            Log::info('Redirect to messages');
+            Flash::success('Email had been send!');
             return Redirect::to(Backend::url('mk3d/contactform/messages'));
 
         }
-        return Redirect::to(Backend::url('mk3d/contactform/messages'));
+        // Return a JSON response with the redirect URL
+        
+        return Redirect::to(Backend::url('mk3d/contactform/messages/update/'.$messageId));
+
+
 
 
     }
@@ -198,32 +214,6 @@ class Messages extends Controller
         return $this->listRefresh();
     }
 
-
-    // *** MAIL SENDING METHODS *** //
-    //SEND RESERVATION CONFIRMATION EMAIL
-    protected function sendReplyEmailBackup($name, $email, $mailSubject, $mailContent)
-    {
-        // Ensure the content is not null
-        if ($mailContent !== null) {
-
-            // Ensure proper Markdown structure
-            $mailContent = $this->ensureProperMarkdownStructure($mailContent);
-
-            // Parse the Markdown content to HTML
-            $htmlContent = new Markdown();           
-            $htmlContent = Markdown::parse($mailContent);
-
-            // Use the Mail facade to send the email
-            Mail::send([], [], function($message) use ($email, $name, $mailSubject, $htmlContent) {
-                $message->to($email, $name);
-                $message->subject($mailSubject);
-                $message->html($htmlContent); // Use the html method to set the HTML content
-            });
-        } else {
-            // Log an error if content is null
-            error_log('Email content is null.');
-        }
-    }
 
     //SEND RESERVATION CONFIRMATION EMAIL
     protected function sendReplyEmail($name, $email, $mailSubject, $mailContent)
@@ -264,23 +254,4 @@ class Messages extends Controller
         // Ensure each HTML node is on its own line
         return preg_replace('/>(\s*)</', ">\n<", $content);
     }     
-
-    protected function sendReservationretertreConfirmationEmail($email, $name, $mailSubject, $reservationDetails)
-    {
-        // Debugging: Log the data to ensure it's correct
-        Log::info('Reservation details: ' . json_encode($reservationDetails));
-
-        // Send the email (assuming you have a mail template set up)
-        Mail::send('mk3d.contactform::mail.reply', [
-            'name' => $name, 
-            'reservation_details' => $reservationDetails
-        ], 
-        
-        function($message) use ($email, $name, $mailSubject) {
-            $message->to($email, $name);
-            $message->subject($mailSubject);
-        });
-
-    }
-
 }
