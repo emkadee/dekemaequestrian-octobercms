@@ -1,13 +1,38 @@
-Hello {{ name }},
+layout = "mk3d.booking::mail.booking_layout"
+==
 
-We regret to inform you that your reservation has been canceled. Below are the details of the canceled reservation(s):
+<p>Beste {{ name }},</p>
+<p>{{ statusMessage }} Hieronder vind je de details:</p>
+<table>
+    <tr>
+        <th align="left">Datum / tijd</th>
+        <th align="left">Locatie</th>
+        <th align="left">Status</th>
+    </tr>
+    {% for reservation in reservation_details %}
+        {% if reservation.date == reservation.end_date %}
+            <td align="left">{{ reservation.date|dutchDate("%A %e %B %Y") }} <br /> {{ reservation.time|date("H:i") }} tot {{ reservation.end_time|date("H:i") }} uur</td>
+        {% else %}
+            <td align="left">{{ reservation.date|dutchDate("%A %e %B %Y") }}  om {{ reservation.time|date("H:i") }} tot <br />{{ reservation.end_date|dutchDate("%A %e %B %Y") }} om {{ reservation.end_time|date("H:i") }} uur</td>
+        {% endif %}
+        <td align="left">{{ reservation.location }}</td>
+        <td align="left">{{ reservation.status_message }}</td>
+    </tr>
+    <tr>
+        <td align="left" colspan="3"> 
+            {% for message in reservation.messages %}
+                {{ message }}<br />
+            {% endfor %}
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td align="left" colspan="3">
+            Geen reservering gevonden.
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<p>Heb je nog vragen? Neem dan contact met ons op, wij helpen je graag verder.</p>
+<br />
 
-{% for reservation in reservations %}
-- Date: {{ reservation.reservation_date }}
-- Time: {{ reservation.reservation_start_time }} to {{ reservation.reservation_end_time }}
-{% endfor %}
-
-If you have any questions, please contact us.
-
-Best regards,
-Your Company

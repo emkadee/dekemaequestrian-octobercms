@@ -15,6 +15,7 @@ use ValidationException;
 use Validator;
 use DateTime;
 use Carbon\Carbon;
+use Config;
 
 
 /**
@@ -29,16 +30,18 @@ class Reservations extends Controller
         \Backend\Behaviors\FormController::class,
         \Backend\Behaviors\RelationController::class
     ];  
-    
-    /* public $implement = ['Backend.Behaviors.ListController', 'Backend.Behaviors.FormController', 'Backend\Behaviors\RelationController', 'Backend.Behaviors.FilterController'];
- */
-
 
     public $formConfig = 'config_form.yaml';
     public $relationConfig = 'config_relation.yaml';
     public $listConfig = 'config_list.yaml';
     public $filterConfig = 'config_filter.yaml';
     public $requiredPermissions = ['mk3d.booking.reservations'];
+
+    // Set default values for attributes
+    protected $attributes = [
+        'update_customer' => true,
+    ];
+
 
     /**
      * __construct the controller
@@ -97,9 +100,10 @@ class Reservations extends Controller
 
     public function formExtendFields($form)
     {
-        Log::info('formExtendFields called' .$form->model->id);
 
         $reservationId = $form->model->id;
+
+        $hasRecurringReservations = false;
 
         // Retrieve the reservation with the given ID
         $reservation = Reservation::find($reservationId);
@@ -112,16 +116,6 @@ class Reservations extends Controller
             $recurringReservations = Reservation::where('recurring_group_id', $recurringGroupId)
                 ->where('id', '!=', $reservationId) // Exclude the current reservation
                 ->get();
-
-            // Format the date and time fields for logging
-/*             foreach ($recurringReservations as $recurringReservation) {
-                $formattedRecurringReservations[] = [
-                    'reservation_start_date' => $recurringReservation->reservation_start_date|date('Y-m-d'),
-                    'reservation_start_time' => $recurringReservation->reservation_start_time,
-                    'reservation_end_time' => $recurringReservation->reservation_end_time,
-                ];
-            } */
-
                         
 
             if ($recurringReservations->isNotEmpty()) {
@@ -146,10 +140,8 @@ class Reservations extends Controller
             Log::info('Reservation not found with ID: ' . $reservationId);
         }
     
-        $this->vars['hasRecurringReservations'] = $hasRecurringReservations;
+        $this->vars['hasRecurringReservations'] = $hasRecurringReservations;     
         
-        
-
         // Check if the form is in create or update context
         if ($form->context == 'create') {
             // Add the partial with the JavaScript
@@ -160,7 +152,7 @@ class Reservations extends Controller
                     'span' => 'full',
                 ],
             ]);
-        }
+        }        
 
         // Call the model's setFormFieldVisibility method
         $form->model->setFormFieldVisibility($form, $form->context);
@@ -172,22 +164,32 @@ class Reservations extends Controller
     //Create a new reservation
     public function onCreate()
     {
-        Log::info('#onCreate called');
         $reservation = new Reservation();
        
-        $reservation->status = 'Pending';
+        $reservation->status = 'pending';
         $reservation->save();
 
         Flash::success('Reservation created successfully.');
         return Redirect::to(Backend::url('mk3d/booking/reservations/update/' . $reservation->id));
     }
 
+    public function onDeleteOldreservations()
+    {
+        $cutoffDate = Carbon::now()->subDays(30);
+        $oldreservations = Reservation::where('reservation_end_date', '<', $cutoffDate)->get();
+
+        foreach ($oldreservations as $oldreservation) {
+            $oldreservation->delete();
+        }
+
+        return $this->listRefresh();
+    }
+
+
 
     //Create a recurring reservation
     public function create_onSave()
     {
-        Log::info('#Create_onSave called');
-
         $formData = post('Reservation');        
         //Get the location ID from the location dropdown and change the post variable accordingly
         $formData['location_id'] = $formData['location'];
@@ -350,12 +352,11 @@ class Reservations extends Controller
 
         // Send the reservation confirmation email with the reservationDetails  
         if($formData['update_customer']){
-            $mailSubject = 'Bevestiging van jouw reservering';	
             $this->sendReservationConfirmationEmail(
                 $formData['customer_email'], 
                 $formData['customer_name'], 
-                $mailSubject, 
-                $reservationDetails
+                $reservationDetails,
+                $formData['status']
             );
         }
         
@@ -367,8 +368,6 @@ class Reservations extends Controller
     //UPDATE A RESERVATION//
     public function update_onSave($recordId = null)
     {
-        Log::info('#update_onSave called');
-
         $formData = post('Reservation');
 
         // Find the reservation or create a new one
@@ -376,14 +375,19 @@ class Reservations extends Controller
         if (!$reservation) {
             $reservation = new Reservation();
         }
-
-        Log::info('Reservation ID: ' . $recordId);
         
         // Check if the update_customer field is true
         $updateCustomer = isset($formData['update_customer']) && $formData['update_customer'];
 
         // Set the content for the email is update_customer is true
         if ($updateCustomer) {
+
+            if($formData['status'] == 'cancelled' || $formData['status'] == 'Cancelled'){
+                $statusMessage = 'Geannuleerd';
+            } else {
+                $statusMessage = $formData['status'] == 'confirmed' ? 'Akkoord' : 'In aanvraag';
+            }
+            
             // Add the reservation date to the list for the email
             $reservationDetails[] = [
                 'date' => $formData['reservation_start_date'],
@@ -392,11 +396,11 @@ class Reservations extends Controller
                 'end_time' => $formData['reservation_end_time'],
                 'location' => Location::find($formData['location'])->name,
                 'messages' => $this->setMessages($reservation, $formData, true),
-                'status_message' => $formData['status'] == 'confirmed' ? 'Akkoord' : 'In aanvraag',
+                'status_message' => $statusMessage,
                 'cancellation_link' => url('/cancellation/' . $reservation->cancellation_token), // Include the cancellation token
             ];
 
-            $mailSubject = 'Update van jouw reservering';   
+            
         }
 
         // Fill the reservation with the form data and save the reservation        
@@ -415,8 +419,8 @@ class Reservations extends Controller
             $this->sendReservationConfirmationEmail(
                 $formData['customer_email'], 
                 $formData['customer_name'], 
-                $mailSubject, 
-                $reservationDetails
+                $reservationDetails,
+                $formData['status']
             );
         }
         
@@ -428,8 +432,6 @@ class Reservations extends Controller
     public function onSaveForRecurring($model)
     {
 
-        Log::info('#onSaveForRecurring called');
-        
         // Retrieve form data
         $formData = post('Reservation');
 
@@ -456,12 +458,10 @@ class Reservations extends Controller
             ->where('reservation_start_date', '>=', $now)
             ->get();
 
-        Log::info('onSaveForRecurring: found ' . $reservations->count() . ' recurring reservations.');
-
         // Update all recurring reservations
-        foreach ($reservations as $recurringReservation) {            
+        foreach ($reservations as $recurringReservation) {           
 
-            Log::info('Updating reservation ID: ' . $recurringReservation->id);
+
             $recurringReservation->customer_name = $formData['customer_name'];
             $recurringReservation->customer_email = $formData['customer_email'];
             $recurringReservation->reservation_start_time = $formData['reservation_start_time'];
@@ -471,6 +471,12 @@ class Reservations extends Controller
             $recurringReservation->save();
 
             if ($formData['update_customer']) {
+                if($formData['status'] == 'cancelled' || $formData['status'] == 'Cancelled'){
+                    $statusMessage = 'Geannuleerd';
+                } else {
+                    $statusMessage = $formData['status'] == 'confirmed' ? 'Akkoord' : 'In aanvraag';
+                }
+
                 $reservationDetails[] = [
                     'date' => $recurringReservation->reservation_start_date,
                     'end_date' => $recurringReservation->reservation_end_date,
@@ -478,23 +484,21 @@ class Reservations extends Controller
                     'end_time' => $formData['reservation_end_time'],
                     'location' => Location::find($formData['location'])->name,
                     'messages' => $this->setMessages($reservation, $formData, true),
-                    'status_message' => $formData['status'] == 'confirmed' ? 'Akkoord' : 'In aanvraag',
+                    'status_message' => $statusMessage,
                     'cancellation_link' => url('/cancellation/' . $recurringReservation->cancellation_token), // Include the cancellation token
 
                 ];
-                Log::info('Reservation details: ' . json_encode($reservationDetails));
             }    
         }
 
         if ($formData['update_customer']) {
 
-            $mailSubject = 'Update van jouw reservering';    
             
             $this->sendReservationConfirmationEmail(
                 $formData['customer_email'], 
                 $formData['customer_name'], 
-                $mailSubject, 
-                $reservationDetails
+                $reservationDetails,
+                $formData['status']
             );
     
         }
@@ -507,44 +511,36 @@ class Reservations extends Controller
 
     // *** MAIL SENDING METHODS *** //
     //SEND RESERVATION CONFIRMATION EMAIL
-    protected function sendReservationConfirmationEmail($email, $name, $mailSubject, $reservationDetails)
+    protected function sendReservationConfirmationEmail($email, $name, $reservationDetails, $status)
     {
-        // Debugging: Log the data to ensure it's correct
-        Log::info('Reservation details: ' . json_encode($reservationDetails));
+        
+        if ($status == 'cancelled' || $status == 'Cancelled') {
+            $template = 'mk3d.booking::mail.cancellation_confirmation';
+            $mailSubject = 'Annulering reservering';
+            $statusMessage = 'De reservering is geannuleerd.';
+        } else if ($status == 'confirmed' || $status == 'Confirmed') {
+            $template = 'mk3d.booking::mail.reservation_confirmation';
+            $mailSubject = 'Bevestiging reservering';
+            $statusMessage = 'De reservering is bevestigd. We zien je graag verschijnen!';
+        } else {
+            $template = 'mk3d.booking::mail.reservation_confirmation';
+            $mailSubject = 'Aanvraag reservering';
+            $statusMessage = 'Bedankt voor de aanvraag! We nemen zo snel mogelijk contact met je op.';
+        }
 
         // Send the email (assuming you have a mail template set up)
-        Mail::send('mk3d.booking::mail.reservation_confirmation', [
+        Mail::send($template, [
             'name' => $name, 
+            'statusMessage' => $statusMessage,
             'reservation_details' => $reservationDetails
         ], 
         
         function($message) use ($email, $name, $mailSubject) {
             $message->to($email, $name);
             $message->subject($mailSubject);
+            $message->bcc(Config::get('mail.from.address'), Config::get('mail.from.name'));
         });
 
-    }
-
-    //SEND CANCELLATION EMAIL
-    protected function sendCancellationEmail($reservations)
-    {
-        if ($reservations->isEmpty()) {
-            return;
-        }
-
-        $customerEmail = $reservations->first()->customer_email;
-        $customerName = $reservations->first()->customer_name;
-        
-
-        $data = [
-            'name' => $customerName,
-            'reservations' => $reservations,
-        ];
-
-        Mail::send('mk3d.booking::mail.cancellation_confirmation', $data, function($message) use ($customerEmail, $customerName) {
-            $message->to($customerEmail, $customerName);
-            $message->subject('Reservation Cancellation Confirmation');
-        });
     }
 
 
@@ -555,41 +551,38 @@ class Reservations extends Controller
         
         if (isset($reservation->location_id) && $reservation->location_id != $formData['location']) {
             // Locatie aangepast
-            array_push($messages, 'De locatie van jouw reservering is aangepast.');
+            array_push($messages, 'De locatie van de reservering is aangepast.');
         }        
 
         if (!$recurring && $reservation->reservation_start_date != $formData['reservation_start_date']) {
             // Startdatum aangepast
-            array_push($messages, 'De startdatum van jouw reservering is aangepast.');
+            array_push($messages, 'De startdatum van de reservering is aangepast.');
             
         }        
         if (!$recurring && $reservation->reservation_end_date != $formData['reservation_end_date']) {
             // Einddatum aangepast
-            array_push($messages, 'De einddatum van jouw reservering is aangepast.');
+            array_push($messages, 'De einddatum van de reservering is aangepast.');
         }
 
         if ($reservation->reservation_start_time != $formData['reservation_start_time']) {
             // Starttijd aangepast
-            array_push($messages, 'De starttijd van jouw reservering is aangepast.');
+            array_push($messages, 'De starttijd van de reservering is aangepast.');
         }
     
         if ($reservation->reservation_end_time != $formData['reservation_end_time']) {
             // Eindtijd aangepast
-            array_push($messages, 'De eindtijd van jouw reservering is aangepast.');
+            array_push($messages, 'De eindtijd van de reservering is aangepast.');
         }
     
         if ($reservation->status != $formData['status'] && ($formData['status'] == 'cancelled' || $formData['status'] == 'Cancelled')) {
             // Status aangepast
-            array_push($messages, 'Jouw reservering is geannuleerd');
-        }
-    
+            array_push($messages, 'De reservering is geannuleerd');
+        }  
+
         if ($reservation->status != $formData['status'] && ($formData['status'] == 'confirmed' || $formData['status'] == 'Confirmed')) {
             // Status aangepast
-            array_push($messages, 'Jouw reservering is akkoord!');
-        }
-
-        Log::info('Messages from setMessages: ' . print_r($messages, true));	
-     
+            array_push($messages, 'De reservering is akkoord!');
+        }     
 
         return $messages;
     }
@@ -597,11 +590,9 @@ class Reservations extends Controller
 
 
 
-
     //RECURRING METHODS
     public function onDeleteRecurring()
     {
-        Log::info('#onDeleteRecurring called');
         $recurringGroupId = post('recurring_group_id');
 
         if (!$recurringGroupId) {
@@ -638,7 +629,6 @@ class Reservations extends Controller
     //Function to get all reservations in JSON for the calendar
     public function getReservations()
     {
-        Log::info('#getReservations called');
 
         $reservations = Reservation::all();
 
@@ -655,20 +645,17 @@ class Reservations extends Controller
             $color = $location->color;
             
             if($reservation->status == 'Pending' OR $reservation->status  == 'pending'){
-                $color = '#707070';
+                $color = '#b5b5b5';
             } elseif ($reservation->status == 'cancelled' OR $reservation->status == 'Cancelled'){ 
-                $color = '#FF6242';
+                $color = '#dc3545';
             }
 
 
             $startDateTime = $startDate . 'T' . $startTime;
             $endDateTime = $endDate . 'T' . $endTime;
 
-            Log::info('Start DateTime: ' . $startDateTime);
-            Log::info('End DateTime: ' . $endDateTime);
-
             return [
-                'title' => $reservation->customer_name . ' - ' . $location->name,
+                'title' => $reservation->customer_name . ' - ' . $reservation->status,
                 'start' => $startDateTime,
                 'end' => $endDateTime,
                 'description' => 'Reservation for ' . $reservation->customer_name,
@@ -677,8 +664,6 @@ class Reservations extends Controller
             ];
             
         });
-
-        Log::info('Events: ' . $events->toJson());
 
         return Response::json($events); 
 

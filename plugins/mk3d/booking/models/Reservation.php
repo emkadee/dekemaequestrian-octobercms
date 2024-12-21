@@ -62,8 +62,15 @@ class Reservation extends Model
         'location_id', 
         'recurring_group_id', 
         'cancellation_token',
-        'status'
+        'status',
+        'update_customer',
     ];
+
+    // Set default values for attributes
+    public $attributes = [
+        'update_customer' => true,
+    ];
+
 
     protected $appends = ['status_label'];
 

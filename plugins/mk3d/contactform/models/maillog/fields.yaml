@@ -4,6 +4,6 @@
 
 fields:
     message:
-        label:
+        label: Maillog
         type: partial
         path: "~/plugins/mk3d/contactform/controllers/maillogs/_field_html_content.htm"

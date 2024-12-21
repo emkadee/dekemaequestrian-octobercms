@@ -1,0 +1,12 @@
+.bg-mailmessage {
+    background: #f9f9f9;
+    border-radius: 4px;
+    border: 1px solid #e6e6e6;
+}
+
+.messsage {
+    width: auto;
+    margin: 1em 1em;
+    padding: 1em;
+
+}

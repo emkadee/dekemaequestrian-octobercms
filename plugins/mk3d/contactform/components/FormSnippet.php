@@ -8,6 +8,9 @@ use Redirect;
 use ValidationException;
 use Session;
 use Log;
+use Mail;
+use Config;
+use Backend;
 
 
 /**
@@ -64,7 +67,7 @@ class FormSnippet extends ComponentBase
         }
 
         // Create a new contact form message
-        Message::create([
+        $newMessage = Message::create([
             'name' => Input::get('name'),
             'email' => Input::get('email'),
             'phone' => Input::get('phone'),
@@ -72,6 +75,20 @@ class FormSnippet extends ComponentBase
             'message' => Input::get('message'),
             'status' => Input::get('status', 'new'),
         ]);
+
+        // Get the ID of the newly created message
+        $messageId = $newMessage->id;
+        $subject = 'New message: ' . $newMessage->subject;
+
+        // Send an extra email to the configured 'from' address with a link to the corresponding message
+        $fromAddress = Config::get('mail.from.address');
+        $fromName = Config::get('mail.from.name');
+        $messageLink = Backend::url('mk3d/contactform/messages/update/' . $messageId);
+
+        Mail::send('mk3d.contactform::mail.admin_notification', ['messageLink' => $messageLink], function($mail) use ($fromAddress, $fromName, $subject) {
+            $mail->to($fromAddress, $fromName);
+            $mail->subject($subject);
+        });
 
 
         // Redirect back to the form page

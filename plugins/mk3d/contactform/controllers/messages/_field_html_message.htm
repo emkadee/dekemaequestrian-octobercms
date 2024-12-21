@@ -1,31 +1,35 @@
-<div class="row mb-3">
-    <div class="col-md-2">Customer : </a></div>
-    <div class="col-md-10"><b><?= $formModel->name ?></b> - <a href="mailto:<?= $formModel->receiver_email ?>"><?= $formModel->email ?></a></div>
-</div>
-<div class="row mb-3">
-    <div class="col-md-2">Date : </div>
-    <div class="col-md-10"><?= $formModel->created_at ?></div>
-</div>
-<div class="row mb-3">
-    <div class="col-md-2">Phonenumber : </div>
-    <div class="col-md-10"><?= $formModel->phone ?></div>
-</div>
-<?php if (!empty($formModel->maillog_id)): ?>
-<div class="row mb-3">
-    <div class="col-md-2">Maillog : </div>
-    <div class="col-md-10"><a href="/adminde/mk3d/contactform/maillogs/update/<?= $formModel->maillog_id ?>">Maillog</a></div>
-</div>
-<?php endif; ?>
+<?= $this->makeAssets() ?>
+
 <div class="row mb-3">
     <div class="col-md-2">Message</div>
     <div class="col-md-10">
-        <div class="pb-3">
-            <b><?= $formModel->subject ?></b>
+        <div class="bg-mailmessage p-2">
+            <div class="row mb-2">
+                <div class="col-md-1">From : </div>
+                <div class="col-md-11"><b><?= $formModel->name ?></b> - <a href="mailto:<?= $formModel->receiver_email ?>"><?= $formModel->email ?></a> - <?= $formModel->phone ?></b></div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-1">Date : </div>
+                <div class="col-md-11"><b><?= $formModel->created_at ?></b></div>
+            </div>
+            
+            <div class="row mb-2">
+                <div class="col-md-1">Subject : </div>
+                <div class="col-md-11"><b><?= $formModel->subject ?></b></div>
+            </div> 
+            <?php if (!empty($formModel->maillog_id)): ?>
+                <div class="row mb-2">
+                    <div class="col-md-1">Reply : </div>
+                    <div class="col-md-11"><a href="/adminde/mk3d/contactform/maillogs/update/<?= $formModel->maillog_id ?>">Maillog</a></div>
+                </div>
+            <?php endif; ?> 
+            <div class="row">
+                <div class="bg-white messsage rounded"><?= $formModel->message ?></div>
+            </div>
+            
+
         </div>
-        <div class="border border-dark p-3">
-            <?= $formModel->message ?>
-        </div>
-    </div>
+    </div>    
 </div>
 
 

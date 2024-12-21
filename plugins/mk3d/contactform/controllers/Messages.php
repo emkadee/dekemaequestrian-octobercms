@@ -10,11 +10,11 @@ use Backend\FormWidgets\RichEditor;
 use Backend\Classes\FormField;
 use Log;
 use Mail;
+use Config;
 use Session;
 use Markdown;
 use Carbon\Carbon;
 use Redirect;
-use Config;
 use AjaxException;
 use Flash;
 /**
@@ -72,11 +72,15 @@ class Messages extends Controller
         parent::__construct();
 
         BackendMenu::setContext('Mk3d.ContactForm', 'contactform', 'messages');
+
+        $this->addCss('/plugins/mk3d/contactform/assets/css/style-contactform.css');
     }
 
 
     public function update($recordId = null, $context = null)
     {
+        
+        
         $this->vars['replyTitles'] = Reply::pluck('title', 'id')->toArray();
         $this->vars['messageId'] = $recordId; // Pass the message ID to the view
         $this->vars['replySubject'] = 'Re: ' . Message::find($recordId)->subject;
@@ -95,6 +99,28 @@ class Messages extends Controller
         // Call the parent update method
         return $this->asExtension('FormController')->update($recordId);
 
+    }
+
+    public function onDelete()
+    {
+        // Get the selected record IDs from the request
+        $recordIds = post('checked');
+
+        if (is_array($recordIds) && count($recordIds)) {
+            foreach ($recordIds as $recordId) {
+                $message = Message::find($recordId);
+
+                if ($message) {
+                    $maillog = Maillog::find($message->maillog_id);
+                    if ($maillog) {
+                        $maillog->delete();
+                    }
+                    $message->delete();
+                }
+            }
+        }
+
+        return $this->listRefresh();
     }
     
 
@@ -240,6 +266,7 @@ class Messages extends Controller
             function($message) use ($email, $name, $mailSubject) {
                 $message->to($email, $name);
                 $message->subject($mailSubject);
+                $message->bcc(Config::get('mail.from.address'), Config::get('mail.from.name'));
             });
 
 

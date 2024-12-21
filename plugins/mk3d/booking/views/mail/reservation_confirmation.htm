@@ -1,10 +1,8 @@
 layout = "mk3d.booking::mail.booking_layout"
 ==
 
-
-
 <p>Beste {{ name }},</p>
-<p>Bedankt voor je reservering. Hieronder vind je de details:</p>
+<p>{{ statusMessage }} Hieronder vind je de details:</p>
 <table>
     <tr>
         <th align="left">Datum / tijd</th>
@@ -13,11 +11,10 @@ layout = "mk3d.booking::mail.booking_layout"
         <th align="left">Annuleren</th>
     </tr>
     {% for reservation in reservation_details %}
-    <tr>
         {% if reservation.date == reservation.end_date %}
             <td align="left">{{ reservation.date|dutchDate("%A %e %B %Y") }} <br /> {{ reservation.time|date("H:i") }} tot {{ reservation.end_time|date("H:i") }} uur</td>
         {% else %}
-            <td align="left">{{ reservation.date|date("U")|date("l d F Y") }} om {{ reservation.time|date("H:i") }} tot <br />{{ reservation.end_date|date('l j F Y', 'Europe/Amsterdam') }} om {{ reservation.end_time|date("H:i") }} uur</td>
+            <td align="left">{{ reservation.date|dutchDate("%A %e %B %Y") }}  om {{ reservation.time|date("H:i") }} tot <br />{{ reservation.end_date|dutchDate("%A %e %B %Y") }} om {{ reservation.end_time|date("H:i") }} uur</td>
         {% endif %}
         <td align="left">{{ reservation.location }}</td>
         <td align="left">{{ reservation.status_message }}</td>

@@ -1,7 +1,8 @@
 <!-- plugins/mk3d/contactform/controllers/messages/_standardreply.htm -->
 
-<div>
-    <div class="col-md-8">
+<div class="row mb-3">
+    <div class="col-md-2">Select a standard reply</div>
+    <div class="col-md-10">
         <div class="form-group">
             <select id="replyDropdown" name="reply_id" class="form-control">\
                 <option value="">Select a reply</option>
@@ -10,19 +11,32 @@
                 <?php endforeach; ?>
             </select>
         </div>
-    <form id="standardReply">
-    <input type="hidden" name="message_id" id="message_id" value="<?= e($messageId) ?>">
-        <div class="form-group">
-            <label for="email-subject">Subject</label>
-            <input value="<?= e($replySubject) ?>" type="text" id="email-subject" name="email_subject" class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="email-message">Message</label>
-            <?= $rich_editor->render() ?>
-        </div>
-        <button  data-request="onSendEmail" class="btn btn-primary">Send email</button>
-    </form>
+    </div>
 </div>
+<form id="standardReply">
+    <input type="hidden" name="message_id" id="message_id" value="<?= e($messageId) ?>">
+    <div class="row">
+        <div class="col-md-2">Subject</div>
+        <div class="col-md-10">
+            <div class="form-group">
+                <input value="<?= e($replySubject) ?>" type="text" id="email-subject" name="email_subject" class="form-control">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">Reply message</div>
+        <div class="col-md-10">
+            <div class="form-group">
+                <?= $rich_editor->render() ?>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-10"><button data-request="onSendEmail" class="btn btn-primary">Send email</button></div>
+    </div>
+</form>
+
 <script>
 
 

@@ -19,5 +19,13 @@
         <i class="icon-delete"></i>
         <?= __("Delete") ?>
     </button>
+    <button
+        class="btn btn-secondary"
+        data-request="onDeleteOldreservations"
+        data-request-message="<?= __("Deleting...") ?>"
+        data-request-confirm="<?= __("Are you sure?") ?>">
+        <i class="icon-delete"></i>
+        <?= __("Delete all reservations older than 30 days") ?>
+    </button>
 
 </div>

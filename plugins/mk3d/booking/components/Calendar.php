@@ -14,6 +14,7 @@ use Config;
 use Redirect;
 use Flash;
 use Carbon\Carbon;
+use Backend;
 
 class Calendar extends ComponentBase
 {
@@ -144,8 +145,6 @@ class Calendar extends ComponentBase
         
         $formData = post();        
 
-        Log::info('Request data: ' . json_encode(post()));
-
         $rules = [
             'name'     => 'required',
             'email'    => 'required|email',
@@ -165,8 +164,7 @@ class Calendar extends ComponentBase
         if ($validation->fails()) {
             Log::info('Validation failed: ' . json_encode($validation->errors()));
             throw new ValidationException($validation);
-        }        
-
+        }
 
         $customer_name = Input::get('name');
         $customer_email = Input::get('email');
@@ -205,8 +203,10 @@ class Calendar extends ComponentBase
             throw new AjaxException('De ' . strtolower($locationName) . ' sluit om ' . date('H:i', $closingTime) . '. Kies een eerdere tijd.');
         }
 
+
         // Create an empty array to store all reservation dates for the email
-        $reservationDates = [];      
+        $reservationDates = [];  
+       
 
         // Generate a unique recurring group ID if not provided
         $recurringGroupId = $formData['recurring_group_id'] ?? uniqid('recurring_', true);
@@ -221,34 +221,6 @@ class Calendar extends ComponentBase
 
             /* $startTime = strtotime($reservationDate->format('Y-m-d') . ' ' . $time); */
             $endTime = $startTime + ($formData['duration'] * 3600);   
-            
-            Log::info('Start Time: ' . $startTime);
-            Log::info('End Time: ' . $endTime);
-            
-            // Check for overlapping reservations
-           /*  $overlappingReservation = Reservation::where('location_id', $formData['location_id'])
-            ->whereDate('reservation_start_date', $reservationDate) // Ensure the date is considered
-            ->where(function($query) use ($startTime, $endTime) {
-                $startTimePlusOneMinute = date('H:i', strtotime('+1 minute', $startTime));
-                $endTimeMinusOneMinute = date('H:i', strtotime('-1 minute', $endTime));
-                
-                
-                $query->where(function($query) use ($startTimePlusOneMinute, $endTimeMinusOneMinute) {
-                    //New       20:00 - 21:00
-                    //Existing  20:30 - 21:30
-                    //21:01 > 20:30 = true
-                    //21:30 < 21:01 = true
-
-                    //New       22:30 - 23:30
-                    //Existing  23:00 - 0:00
-
-
-                    $query->where('reservation_start_time', '>', $startTimePlusOneMinute)
-                          ->where('reservation_end_time', '>', $endTimeMinusOneMinute);
-    
-                });
-            })
-            ->get();  */
 
             $overlappingReservation = Reservation::where('location_id', $formData['location_id'])
             ->whereDate('reservation_start_date', $reservationDate) // Ensure the date is considered
@@ -287,11 +259,8 @@ class Calendar extends ComponentBase
             foreach ($overlappingReservations as $overlappingReservationGroup) {
                 foreach ($overlappingReservationGroup as $overlappingReservation) {
                     $startDate = $this->dutchDate($overlappingReservation['reservation_start_date'], 'l d F Y');
-
-
                     $startTime = date('H:i', strtotime($overlappingReservation['reservation_start_time']));
                     $endTime = date('H:i', strtotime($overlappingReservation['reservation_end_time']));
-
                     $message .= 'De '. strtolower($locationName) .' is op ' . $startDate . ' van ' . $startTime . ' tot ' . $endTime . ' al bezet<br />';
                 }
             }
@@ -321,6 +290,11 @@ class Calendar extends ComponentBase
                 $reservation->status = 'Pending';
                 $reservation->save();
 
+                // Store the ID of the first reservation
+                if ($i === 0) {
+                    $reservationId = $reservation->id;
+                }
+
                 //Set the messages for each reservation for the update email
                 $messages = [];
                 array_push($messages, 'Je krijgt nog een bevestiging van deze reservering als deze akkoord is.');                
@@ -332,6 +306,7 @@ class Calendar extends ComponentBase
                 // Add the reservation date to the list for the email
                 $reservationDetails[] = [
                     'date' => $reservationDate->format('Y-m-d'),
+                    'end_date' => $reservationDate->format('Y-m-d'),
                     'time' => date('H:i', $startTime),
                     'end_time' => date('H:i', $endTime),
                     'location' => $locationName,
@@ -341,11 +316,17 @@ class Calendar extends ComponentBase
                 ];
             }            
         }
+
+        if ($recurringCount > 1) {
+            $reservationType = 'recurring';
+        } else {
+            $reservationType = 'single';
+        }
         
         
         // Send the reservation confirmation email with the cancellation link and the location name
-        $mailSubject = 'Update van jouw reservering';        
-        $this->sendReservationConfirmationEmail($formData['email'], $formData['name'], $mailSubject, $reservationDetails);
+        $mailSubject = 'Reserverings aanvraag';        
+        $this->sendReservationConfirmationEmail($formData['email'], $formData['name'], $mailSubject, $reservationDetails, $reservationId, $reservationType);
         
         Log::info('No overlapping reservation found');
         // Proceed with reservation logic if no overlap
@@ -367,20 +348,38 @@ class Calendar extends ComponentBase
 
     } */
 
-    protected function sendReservationConfirmationEmail($email, $name, $mailSubject, $reservationDetails)
+    protected function sendReservationConfirmationEmail($email, $name, $mailSubject, $reservationDetails, $reservationId, $reservationType)
     {
         // Debugging: Log the data to ensure it's correct
         Log::info('Reservation details: ' . json_encode($reservationDetails));
+        $statusMessage = 'Bedankt voor jouw aanvraag! We nemen zo snel mogelijk contact met je op.';
 
         // Send the email (assuming you have a mail template set up)
         Mail::send('mk3d.booking::mail.reservation_confirmation', [
-            'name' => $name, 
+            'name' => $name,
+            'statusMessage' => $statusMessage,
             'reservation_details' => $reservationDetails
         ], 
+
+        
         
         function($message) use ($email, $name, $mailSubject) {
             $message->to($email, $name);
             $message->subject($mailSubject);
+            $message->bcc(Config::get('mail.from.address'), Config::get('mail.from.name'));
+        });
+
+
+        $subject = 'New ' . $reservationType . ' reservation';
+
+        // Send an extra email to the configured 'from' address with a link to the corresponding message
+        $fromAddress = Config::get('mail.from.address');
+        $fromName = Config::get('mail.from.name');
+        $reservationLink = Backend::url('mk3d/booking/reservations/update/' . $reservationId);
+
+        Mail::send('mk3d.contactform::mail.admin_notification', ['messageLink' => $reservationLink], function($mail) use ($fromAddress, $fromName, $subject) {
+            $mail->to($fromAddress, $fromName);
+            $mail->subject($subject);
         });
 
     }

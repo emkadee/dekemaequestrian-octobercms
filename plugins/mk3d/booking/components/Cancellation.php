@@ -6,6 +6,9 @@ use Mk3d\Booking\Models\Location;
 use Log;
 use Input;
 use Flash;
+use Mail;
+use Config;
+use Backend;
 
 
 class Cancellation extends ComponentBase
@@ -67,8 +70,39 @@ class Cancellation extends ComponentBase
         $cancellationToken = post('cancellation_token');
         $cancelAll = post('cancel_all', false);
 
-        $reservation = Reservation::where('cancellation_token', $cancellationToken)->first();
+        $reservation = Reservation::where('cancellation_token', $cancellationToken)->get();
+        
+        $messages = 'Deze reservering is geannuleerd.';
+        $statusMessage = 'Geannuleerd';
 
+        $i = 0;
+
+        foreach ($reservation as $res) {
+            if ($i<1){
+                $location = Location::find($res->location_id);
+                $locationName = $location->name;
+                $email = $res->customer_email;
+                $name = $res->customer_name;
+                $reservationId = $res->id;
+            }
+            $reservationDetails[] = [
+                'date' => $res->reservation_start_date,
+                'end_date' => $res->reservation_end_date,
+                'time' => $res->reservation_start_time,
+                'end_time' => $res->reservation_end_time,
+                'location' => $locationName,
+                'messages' => $messages,
+                'status_message' => $statusMessage
+            ];
+
+            $i++;
+        } 
+
+        // Send the reservation confirmation email with the cancellation link and the location name
+        $mailSubject = 'Jouw reservering is geannuleerd';
+        $this->sendReservationConfirmationEmail($email, $name, $mailSubject, $reservationDetails, $reservationId);
+
+        $reservation = Reservation::where('cancellation_token', $cancellationToken)->first();
 
         if (!$reservation) {
             \Flash::error('Invalid or expired cancellation token.');
@@ -76,15 +110,52 @@ class Cancellation extends ComponentBase
         }
 
         if ($cancelAll) {
-            Reservation::where('recurring_group_id', $reservation->recurring_group_id)->delete();
+            Reservation::where('recurring_group_id', $reservation->recurring_group_id)->update(['status' => 'cancelled']);
             \Flash::success('All recurring reservations have been canceled.');
         } else {
-            $reservation->delete();
+            $reservation->update(['status' => 'cancelled']);
             \Flash::success('Your reservation has been canceled.');
         }
 
+       
+
+
+
         return \Redirect::to('/');
     }
+
+    protected function sendReservationConfirmationEmail($email, $name, $mailSubject, $reservationDetails, $reservationId)
+    {
+        // Debugging: Log the data to ensure it's correct
+        Log::info('Reservation details: ' . json_encode($reservationDetails));
+
+        // Send the email (assuming you have a mail template set up)
+        Mail::send('mk3d.booking::mail.cancellation_confirmation', [
+            'name' => $name, 
+            'reservation_details' => $reservationDetails
+        ], 
+        
+        function($message) use ($email, $name, $mailSubject) {
+            $message->to($email, $name);
+            $message->subject($mailSubject);
+            $message->bcc(Config::get('mail.from.address'), Config::get('mail.from.name'));
+        });
+
+
+        $subject = 'Reservering geannuleerd';
+
+        // Send an extra email to the configured 'from' address with a link to the corresponding message
+        $fromAddress = Config::get('mail.from.address');
+        $fromName = Config::get('mail.from.name');
+        $reservationLink = Backend::url('mk3d/booking/reservations/update/' . $reservationId);
+
+        Mail::send('mk3d.contactform::mail.admin_notification', ['messageLink' => $reservationLink], function($mail) use ($fromAddress, $fromName, $subject) {
+            $mail->to($fromAddress, $fromName);
+            $mail->subject($subject);
+        });
+
+    }
+
 
 }
 

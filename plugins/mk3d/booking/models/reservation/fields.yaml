@@ -42,18 +42,15 @@ fields:
             confirmed: Confirmed
             cancelled: Cancelled
         span: left
-
     reservation_end_time:
         label: Reservation End Time
         type: datepicker
         mode: time
         span: right
-
     recurring:
         label: Recurring Reservation
         type: checkbox
         span: right
-
     frequency:
         label: Frequency
         type: dropdown
@@ -63,16 +60,13 @@ fields:
             4: Every four weeks
         dependsOn: recurring
         span: right
-
     recurring_end_date:
         label: End Date
         type: datepicker
         mode: date
         dependsOn: recurring
         span: right
-
     update_customer:
         label: Send an email to the customer
         type: checkbox
-        span: left
-        default: 1
+        default: true
